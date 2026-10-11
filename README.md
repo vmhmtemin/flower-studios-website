@@ -24,20 +24,29 @@ python3 -m http.server 8000
 # sonra tarayıcıda http://localhost:8000
 ```
 
-## Animasyon yardımcıları
+## Hareket sistemi
 
-HTML'de JS yazmadan animasyon eklemek için:
+- **F'nin birleşmesi** sayfanın tek büyük anı. Hero, ekran yüksekliğinden biraz uzun (`--run`);
+  bu aralıkta `position: sticky` ile sahne sabit kalır ve parçalar doğrudan kaydırma
+  ilerlemesine göre birleşir (JS pin yok, geri kaydırınca geri ayrılır).
+  Dağınık konumlar SVG'nin kendi koordinatlarında tanımlı (`js/parallax.js` → `SCATTER`),
+  birleşik hâl her zaman tam `0,0,0`. Kapanış bölümünde dev F aynı şekilde tekrar birleşir.
+- **Marquee**: iki özdeş grup, `-50%` ile dikişsiz döngü; kaydırma hızı akışı geçici hızlandırır.
+- **Hareketi azalt** açıksa: F birleşik, sticky aralık yok, döngüler durur.
+
+## HTML yardımcıları
 
 | Özellik | Etki |
 |---|---|
-| `data-reveal` | Aşağıdan yumuşak belirme |
-| `data-reveal="words"` | Kelime kelime yukarı kayma |
-| `data-reveal="chars"` | Harf harf yukarı kayma |
-| `data-reveal="slash"` | Açılı maskeyle soldan açılma |
-| `data-delay="0.2"` | Gecikme (saniye) |
-| `data-speed="1.2"` | Parallax hızı (negatif = ters yön) |
+| `data-reveal="words"` | Başlığın kelime kelime girişi |
+| `data-fit` + `.fit-inner` | Yazıyı kapsayıcının genişliğine tam oturtur |
+| `data-depth="0.4"` | Proje sahnesi katmanının derinliği |
+| `data-marquee="1"` / `"-1"` | Marquee yönü |
 
-Kullanıcının cihazında "hareketi azalt" ayarı açıksa tüm animasyonlar kapanır.
+## Yayın
+
+GitHub Pages dosyaları 10 dk önbelleğe alır. CSS/JS değiştiğinde `index.html` içindeki
+`?v=` numarasını artır; yoksa yeni HTML eski CSS ile açılabilir.
 
 ## Yol haritası
 
