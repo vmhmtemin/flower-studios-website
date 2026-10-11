@@ -310,17 +310,24 @@ html.lenis, html.lenis body { height: auto; }
 .footer__brand { grid-column: 1 / 6; }
 .brand-lock {
   display: inline-flex;
+  white-space: nowrap;
   align-items: flex-end;
   gap: 2px;
   color: var(--c-white);
 }
 .brand-lock svg { width: auto; height: 64px; flex: none; }
-.brand-lock span {
-  font-family: "Kaushan Script", cursive;
-  font-size: 42px;
-  line-height: 0.9;
-  margin-bottom: 2px;   /* yazının taban çizgisi logonun ucuna otursun */
-  white-space: nowrap;
+.brand-lock__script {
+  font-family: "Yellowtail", cursive;
+  font-size: 46px;
+  line-height: 0.8;
+  margin-bottom: 1px;   /* taban çizgisi logonun ucuna otursun */
+}
+.brand-lock__word {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 0.12em;
+  margin: 0 0 4px 12px;
 }
 .footer__nav { grid-column: 7 / 10; }
 .footer__social { grid-column: 10 / 13; }
