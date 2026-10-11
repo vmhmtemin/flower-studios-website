@@ -21,7 +21,7 @@
   /* hafif turuncu ışık */
   background:
     radial-gradient(60% 55% at 50% 55%, rgba(254, 92, 29, 0.10), transparent 70%),
-    var(--c-black);
+    var(--bg);
 }
 
 .hero__center {
@@ -82,7 +82,7 @@
   will-change: transform;
 }
 .shard--o { background: var(--c-orange); opacity: 0.55; }
-.shard--w { background: var(--c-white); opacity: 0.16; }
+.shard--w { background: var(--fg); opacity: 0.16; }
 
 /* Hero arkasındaki dev çapraz şerit */
 .hero__beam {
@@ -158,8 +158,8 @@
   opacity: 0.3;
   transition: opacity var(--dur-m) var(--ease), color var(--dur-m);
 }
-.growth__step svg { color: var(--c-white); width: 26px; height: auto; }
-.growth__step.is-on { opacity: 1; color: var(--c-white); }
+.growth__step svg { color: var(--fg); width: 26px; height: auto; }
+.growth__step.is-on { opacity: 1; color: var(--fg); }
 .growth__step + .growth__step::before {
   content: "";
   width: clamp(32px, 5vw, 72px);
@@ -200,7 +200,7 @@
 .slash i + i {
   top: calc(40% + clamp(30px, 4vw, 56px));
   height: 6px;
-  background: var(--c-white);
+  background: var(--fg);
   transform-origin: 100% 50%;
 }
 
@@ -233,7 +233,7 @@
 .work__link:focus-visible { outline: none; }
 .work:has(.work__link:focus-visible) { outline: 2px solid var(--accent); outline-offset: -2px; }
 
-.work__desc { color: #c9c9c9; max-width: 50ch; }
+.work__desc { color: var(--fg-soft); max-width: 50ch; }
 
 /* Künye */
 .work__meta { font-size: var(--t-small); }
@@ -255,7 +255,7 @@
 .status--live { animation: pulse 1.6s infinite; }
 @keyframes pulse { 50% { opacity: 0.25; } }
 
-.work__more { color: var(--c-white); }
+.work__more { color: var(--fg); }
 .work:hover .work__more::after { width: 46px; }
 
 /* ---------- Remnant Protocol: tam genişlik, sıcak, sert ---------- */
@@ -418,8 +418,8 @@
   background: var(--c-orange);
   clip-path: polygon(0 45%, 100% 0, 89% 55%, 0 100%);
 }
-.marquee__row--outline { color: #262626; }   /* kontür yerine koyu dolgu: harf içi çizgiler görünmez */
-.marquee__row--outline b { background: #3d3d3d; }
+.marquee__row--outline { color: var(--ghost); }   /* kontür yerine soluk dolgu: harf içi çizgiler görünmez */
+.marquee__row--outline b { background: var(--ghost-2); }
 
 /* ==========================================================================
    NE YAPIYORUZ
@@ -465,7 +465,7 @@
   transition: color var(--dur-m) var(--ease);
 }
 .field:hover .field__num { color: var(--num, var(--c-orange)); }
-.field--apps { --num: var(--c-white); }
+.field--apps { --num: var(--fg); }
 
 .field__title {
   font-family: var(--f-display);
@@ -474,7 +474,7 @@
   line-height: 1;
   margin-bottom: 18px;
 }
-.field p { color: #c9c9c9; max-width: 40ch; }
+.field p { color: var(--fg-soft); max-width: 40ch; }
 .field__list {
   margin-top: 28px;
   display: grid;
@@ -543,6 +543,21 @@
    ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
   .about__text .hl-word { opacity: 1; }
-  .growth__step { opacity: 1; color: var(--c-white); }
+  .growth__step { opacity: 1; color: var(--fg); }
   .slash i { transform: rotate(var(--slant)) scaleX(1); }
+}
+
+/* ==========================================================================
+   TEMA: logonun beyaz parçası her temada metin rengini alır
+   ========================================================================== */
+.piece--white,
+.closing__mark [data-piece="white"] { fill: var(--fg); transition: fill 0.4s; }
+
+/* Açık temada Remnant başlığı koyu görselin üstüne binmesin (siyah yazı kaybolur) */
+:root[data-theme="light"] .work--remnant .work__title { margin-top: 0.3em; }
+/* Açık temada ışık şeridi ve logo parlaması biraz daha belirgin */
+:root[data-theme="light"] .hero__stage {
+  background:
+    radial-gradient(60% 55% at 50% 55%, rgba(254, 92, 29, 0.14), transparent 70%),
+    var(--bg);
 }

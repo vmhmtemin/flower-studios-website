@@ -15,6 +15,15 @@
   --c-line: #262626;     /* ince çizgiler */
   --c-tide: #9fb3c4;     /* yalnızca Living Promise */
 
+  /* Tema renkleri (koyu varsayılan). Açık tema aşağıda [data-theme="light"] */
+  --bg: #000000;              /* sayfa zemini */
+  --fg: #ffffff;              /* ana metin, logonun beyaz parçası */
+  --fg-soft: #c9c9c9;         /* açıklama metinleri */
+  --fg-dim: rgba(255, 255, 255, 0.6);
+  --nav-bg: rgba(0, 0, 0, 0.82);
+  --ghost: #262626;           /* marquee ikinci satır */
+  --ghost-2: #3d3d3d;
+
   /* Tipografi */
   --f-display: "Montserrat", system-ui, sans-serif;
   --f-body: "Inter", system-ui, sans-serif;
@@ -39,6 +48,23 @@
   --dur-l: 1.1s;                            /* giriş anları */
 }
 
+/* ---------- Açık tema ---------- */
+:root[data-theme="light"] {
+  --bg: #ffffff;
+  --fg: #000000;
+  --fg-soft: #3d3d3d;
+  --fg-dim: rgba(0, 0, 0, 0.6);
+  --nav-bg: rgba(255, 255, 255, 0.86);
+  --ghost: #e8e8e8;
+  --ghost-2: #cfcfcf;
+  --c-ash: #6b6b6b;           /* beyaz üstünde 5.3:1 kontrast */
+  --c-soot: #efefef;
+  --c-line: #e3e3e3;
+  --c-tide: #4f6b82;          /* beyaz zeminde okunabilir soğuk vurgu */
+  color-scheme: light;
+}
+:root { color-scheme: dark; }
+
 /* ---------- 2. Reset ---------- */
 *,
 *::before,
@@ -47,9 +73,10 @@
 html { -webkit-text-size-adjust: 100%; }
 
 body {
-  background: var(--c-black);
-  color: var(--c-white);
+  background: var(--bg);
+  color: var(--fg);
   font-family: var(--f-body);
+  transition: background-color 0.4s, color 0.4s;
   font-size: var(--t-body);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -147,7 +174,7 @@ html.lenis, html.lenis body { height: auto; }
   transition: background var(--dur-m), border-color var(--dur-m), transform var(--dur-m) var(--ease);
 }
 .nav.is-scrolled {
-  background: rgba(0, 0, 0, 0.82);
+  background: var(--nav-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-color: var(--c-line);
@@ -189,14 +216,14 @@ html.lenis, html.lenis body { height: auto; }
   transition: transform var(--dur-m) var(--ease);
 }
 .nav__links a:hover,
-.nav__links a[aria-current="page"] { color: var(--c-white); }
+.nav__links a[aria-current="page"] { color: var(--fg); }
 .nav__links a:hover::after,
 .nav__links a[aria-current="page"]::after { transform: scaleX(1) skewX(-30deg); }
 
 .nav__toggle { display: none; width: 44px; height: 44px; position: relative; }
 .nav__toggle span {
   position: absolute; left: 10px; right: 10px; height: 2px;
-  background: var(--c-white);
+  background: var(--fg);
   transition: transform var(--dur-m) var(--ease), right var(--dur-m) var(--ease);
 }
 .nav__toggle span:nth-child(1) { top: 16px; }
@@ -204,7 +231,27 @@ html.lenis, html.lenis body { height: auto; }
 .nav-open .nav__toggle span:nth-child(1) { transform: translateY(5px) rotate(45deg); }
 .nav-open .nav__toggle span:nth-child(2) { transform: translateY(-5px) rotate(-45deg); right: 10px; }
 
+.nav__right { display: flex; align-items: center; gap: clamp(16px, 2.4vw, 36px); }
+
+/* Tema düğmesi: koyu temada güneş, açık temada ay görünür */
+.theme-toggle {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  color: var(--c-ash);
+  transition: color var(--dur-s);
+}
+.theme-toggle:hover { color: var(--c-orange); }
+.theme-toggle svg { grid-area: 1 / 1; transition: transform var(--dur-m) var(--ease), opacity var(--dur-s); }
+.theme-toggle__moon { opacity: 0; transform: rotate(-60deg) scale(0.6); }
+:root[data-theme="light"] .theme-toggle__sun { opacity: 0; transform: rotate(60deg) scale(0.6); }
+:root[data-theme="light"] .theme-toggle__moon { opacity: 1; transform: none; }
+
 @media (max-width: 760px) {
+  .nav__right { gap: 4px; }
   .nav__toggle { display: block; z-index: 2; }
   .nav__links {
     position: fixed;
@@ -213,7 +260,7 @@ html.lenis, html.lenis body { height: auto; }
     justify-content: center;
     padding-inline: var(--gutter);
     gap: 8px;
-    background: var(--c-black);
+    background: var(--bg);
     clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
     visibility: hidden;
     transition: clip-path 0.7s var(--ease), visibility 0s 0.7s;
@@ -222,7 +269,7 @@ html.lenis, html.lenis body { height: auto; }
     font-family: var(--f-display);
     font-size: 34px;
     font-weight: 700;
-    color: var(--c-white);
+    color: var(--fg);
   }
   .nav-open .nav__links {
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
@@ -272,13 +319,16 @@ html.lenis, html.lenis body { height: auto; }
   content: "";
   position: absolute;
   inset: 0;
-  background: var(--c-white);
+  background: var(--fg);
   transform: translateX(-102%) skewX(-20deg);
   transition: transform var(--dur-m) var(--ease);
   z-index: -1;
 }
 .btn:hover::before,
 .btn:focus-visible::before { transform: none; }
+.btn { transition: color var(--dur-m) var(--ease); }
+.btn:hover,
+.btn:focus-visible { color: var(--bg); }
 .btn:focus-visible { outline-offset: 6px; }
 
 /* ---------- 7. Footer ---------- */
@@ -286,25 +336,17 @@ html.lenis, html.lenis body { height: auto; }
   padding-block: clamp(64px, 8vw, 110px) 32px;
   border-top: 1px solid var(--c-line);
 }
-/* Dev isim: turuncu şerit üzerinde siyah yazı. Şerit .fit-inner'ın
-   kendisi olduğu için iç boşluklar (em) yazıyla birlikte ölçeklenir ve
-   FS.fit şeridi kapsayıcı genişliğine tam oturtur. */
+/* Dev isim: zeminden çok az ayrışan dolgu (genişliğe JS ile tam oturur) */
 .footer__giant {
   font-family: var(--f-display);
   font-weight: 800;
   font-size: 10vw;
   line-height: 0.82;
   letter-spacing: -0.02em;
+  color: var(--c-soot);
   white-space: nowrap;
   user-select: none;
   margin-bottom: clamp(48px, 6vw, 80px);
-}
-.footer__giant .fit-inner {
-  align-items: center;
-  line-height: 1;
-  background: #ba391e;
-  color: var(--c-black);
-  padding: 0.1em 0.04em 0.1em 0.06em;
 }
 .footer__row { row-gap: 40px; }
 .footer__brand { grid-column: 1 / 6; }
@@ -317,7 +359,7 @@ html.lenis, html.lenis body { height: auto; }
   display: inline-flex;
   align-items: baseline;
   white-space: nowrap;
-  color: var(--c-white);
+  color: var(--fg);
   line-height: 1;
 }
 .brand-lock svg { width: auto; height: var(--lock-h); flex: none; }
@@ -359,14 +401,15 @@ html.lenis, html.lenis body { height: auto; }
   padding-top: 24px;
   border-top: 1px solid var(--c-line);
   font-size: var(--t-small);
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--fg-dim);
 }
 /* İmza satırı */
 .footer__credit { display: inline-flex; align-items: center; gap: 10px; }
 .footer__credit svg {
   width: 13px;
   height: auto;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--fg);
+  opacity: 0.85;
   transition: transform var(--dur-m) var(--ease);
 }
 .footer__credit:hover svg { transform: rotate(-8deg) scale(1.12); }

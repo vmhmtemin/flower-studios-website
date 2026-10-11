@@ -57,6 +57,30 @@
     });
   };
 
+  /* ---------- Tema (açık / koyu) ----------
+     Tercih localStorage'da saklanır; ilk çizimden önce <head> içindeki
+     küçük script uygular, burada sadece düğme yönetilir. */
+  function initTheme() {
+    const btn = document.querySelector(".theme-toggle");
+    if (!btn) return;
+    const root = document.documentElement;
+    const meta = document.querySelector('meta[name="theme-color"]');
+    const sync = () => {
+      const light = root.getAttribute("data-theme") === "light";
+      btn.setAttribute("aria-label", light ? "Koyu temaya geç" : "Açık temaya geç");
+      btn.setAttribute("aria-pressed", String(light));
+      if (meta) meta.setAttribute("content", light ? "#ffffff" : "#000000");
+    };
+    btn.addEventListener("click", () => {
+      const light = root.getAttribute("data-theme") !== "light";
+      if (light) root.setAttribute("data-theme", "light");
+      else root.removeAttribute("data-theme");
+      try { localStorage.setItem("fs-theme", light ? "light" : "dark"); } catch (e) {}
+      sync();
+    });
+    sync();
+  }
+
   /* ---------- Navigasyon ---------- */
   function initNav() {
     const nav = document.querySelector(".nav");
@@ -136,6 +160,7 @@
   /* ---------- Başlat ---------- */
   function init() {
     FS.fit();
+    initTheme();
 
     if (typeof gsap === "undefined" || typeof ScrollTrigger === "undefined") {
       // Kütüphaneler yüklenemezse içerik yine de tamamen görünsün
