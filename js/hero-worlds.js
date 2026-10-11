@@ -38,11 +38,11 @@
 
   // Ayarlar
   const CFG = {
-    count: { desktop: 24, mobile: 10 },
+    count: { desktop: 22, mobile: 10 },
     formOnMobile: false,           // telefonda birleşme kapalı (performans)
-    farBias: 1.5,                  // >1: uzak (küçük) parçalar daha çok
+    farBias: 1,                    // 1: derinlikler eşit dağılır (>1 olursa uzak/küçük parçalar çoğalır)
     // Derinliğe göre (uzak → yakın)
-    scale: [0.035, 0.2],           // parça boyu (logoya oranla); mobilde ×0.7
+    scale: [0.06, 0.22],           // parça boyu (logoya oranla); mobilde ×0.7
     opacity: { white: [0.08, 0.22], orange: [0.18, 0.55] },
     speed: [3, 16],                // px/sn
     depth: [0.3, 1.1],             // kaydırma parallax'ı
@@ -79,8 +79,14 @@
       W = r.width;
       H = r.height;
       mobile = W < 700;
-      // Ortadaki logo + başlık kelimelerinin gerçek kutuları (biraz genişletilmiş):
-      // birleşmeler ve parçaların doğduğu yerler buraya düşmez
+      measureAvoid();
+    }
+
+    // Ortadaki logo + başlık kelimelerinin gerçek kutuları (biraz genişletilmiş):
+    // birleşmeler ve parçaların doğduğu yerler buraya düşmez. Font geç
+    // yüklenince başlık satır değiştirebildiği için her denemede yeniden ölçülür.
+    function measureAvoid() {
+      const r = stage.getBoundingClientRect();
       const boxes = [...stage.querySelectorAll(".hero__logo, .hero__word")].map((el) => el.getBoundingClientRect());
       const pad = mobile ? 24 : 60;
       avoid = {
@@ -149,9 +155,10 @@
         p.o = p.baseO;
         p.d = p.baseD;
         p.r = rand(-180, 180);
-        // Ortadaki alanın dışında bir yer seç
-        let tries = 0;
-        do { p.x = rand(0, W); p.y = rand(0, H); } while (inAvoid(p.x, p.y) && ++tries < 30);
+        // Ekranın herhangi bir yerinde doğar (süzülen parçalar yazının arkasından
+        // geçebilir; sadece birleşmeler orta alandan kaçınır)
+        p.x = rand(0, W);
+        p.y = rand(0, H);
         randomVelocity(p);
         parts.push(p);
       }
@@ -191,6 +198,7 @@
     const spots = [];            // aktif birleşme noktaları
     const timelines = new Set(); // aktif birleşme zaman çizelgeleri
     const formLog = [];          // son birleşmeler (hata ayıklama)
+    const diag = { noTrio: 0, noSpot: 0 };
     let nextForm = rand(1.2, 2); // ilk birleşme açılıştan kısa süre sonra
 
     const screenY = (p) => p.y - par * p.d;
@@ -255,8 +263,9 @@
     }
 
     function form() {
+      measureAvoid();
       const trio = findTrio();
-      if (!trio) return false;
+      if (!trio) { diag.noTrio++; return false; }
 
       // Ortak boy, derinlik: üç parçanın ortalaması (en fazla ~%15 uyum payı)
       const avg = (f) => trio.reduce((s, p) => s + f(p), 0) / 3;
@@ -265,7 +274,7 @@
       // F, parçaların bulunduğu yerin ortasında oluşur
       const rad = 650 * S * 0.6;
       const spot = nearestSpot(avg((p) => p.x), avg((p) => screenY(p)), rad);
-      if (!spot) return false;
+      if (!spot) { diag.noSpot++; return false; }
       const [fx, fy] = spot;
 
       forming++;
@@ -343,7 +352,7 @@
 
     // Hata ayıklama için durum (konsoldan: FS.worlds.state())
     if (window.FS) {
-      window.FS.worlds = { state: () => ({ W, H, avoid, forming, nextForm, visible, n: parts.length, spots: spots.map((s) => s.map(Math.round)), formLog }) };
+      window.FS.worlds = { state: () => ({ W, H, avoid, forming, nextForm, visible, n: parts.length, spots: spots.map((s) => s.map(Math.round)), formLog, diag }) };
     }
 
     if (reduce) return; // sabit dursun

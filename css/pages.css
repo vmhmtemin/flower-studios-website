@@ -88,7 +88,11 @@
   transform-origin: 0 0;
   will-change: transform, opacity;
 }
-.hero__worlds .wp svg { position: absolute; overflow: visible; }
+.hero__worlds .wp svg {
+  position: absolute;
+  overflow: visible;
+  max-width: none;   /* base.css'teki "svg { max-width: 100% }" 0 genişlikli kapsayıcıda parçayı yok ediyordu */
+}
 .hero__worlds .wp--white { fill: var(--fg); }
 .hero__worlds .wp--orange { fill: var(--c-orange); }
 
