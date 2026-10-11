@@ -26,11 +26,12 @@ python3 -m http.server 8000
 
 ## Hareket sistemi
 
-- **F'nin birleşmesi** sayfanın tek büyük anı. Hero, ekran yüksekliğinden biraz uzun (`--run`);
-  bu aralıkta `position: sticky` ile sahne sabit kalır ve parçalar doğrudan kaydırma
-  ilerlemesine göre birleşir (JS pin yok, geri kaydırınca geri ayrılır).
-  Dağınık konumlar SVG'nin kendi koordinatlarında tanımlı (`js/parallax.js` → `SCATTER`),
-  birleşik hâl her zaman tam `0,0,0`. Kapanış bölümünde dev F aynı şekilde tekrar birleşir.
+- **F'nin birleşmesi** sayfanın tek büyük anı. Hero, ekran yüksekliğinden `--run` kadar uzun
+  (masaüstü 120vh, telefon 90vh); bu aralıkta sahne CSS `position: sticky` ile sabit kalır
+  (JS pin yok: telefonda titreme/adres çubuğu zıplaması olmaz). Parçalar kaydırma ilerlemesiyle
+  birleşir, ışık şeridi geçer; geri kaydırınca ayrılır. Konumları tek bir `render()` yazar.
+- **Arka plan dünyaları** (`js/hero-worlds.js`): logonun parçaları derinlikleriyle süzülür,
+  aynı derinliktekiler ara sıra F olur. Telefonda birleşme yok, daha az parça.
 - **Marquee**: iki özdeş grup, `-50%` ile dikişsiz döngü; kaydırma hızı akışı geçici hızlandırır.
 - **Hareketi azalt** açıksa: F birleşik, sticky aralık yok, döngüler durur.
 

@@ -7,21 +7,26 @@
 /* ==========================================================================
    HERO (ilk tasarımdaki hâli: ışık şeridi, parlama, ortalı yerleşim)
    ========================================================================== */
+/* --run: F'nin birleştiği kaydırma mesafesi. Bu mesafe boyunca sahne,
+   tarayıcının kendi "sticky" davranışıyla ekranda sabit kalır (JS pin yok:
+   telefonlarda titreme ve adres çubuğu zıplaması olmaz). */
 .hero {
+  --run: 120vh;
   position: relative;
-  height: 100vh;
-  height: 100svh;
+  height: calc(100vh + var(--run));
+  height: calc(100svh + var(--run));
 }
 .hero__stage {
-  position: relative;
-  height: 100%;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
   overflow: hidden;
   display: grid;
   place-items: center;
   /* hafif turuncu ışık */
   background:
-    /* --space: arkadaki uzayın görünürlüğü (1 → 0, F oturdukça; parallax.js) */
-    radial-gradient(60% 55% at 50% 55%, rgba(254, 92, 29, calc(0.10 * var(--space, 1))), transparent 70%),
+    radial-gradient(60% 55% at 50% 55%, rgba(254, 92, 29, 0.10), transparent 70%),
     var(--bg);
 }
 
@@ -76,7 +81,6 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  opacity: var(--space, 1);   /* F oturdukça uzay kararır */
 }
 /* Her parça kendi katmanında; hareket sadece transform/opacity */
 .hero__worlds .wp {
@@ -570,7 +574,7 @@
 /* Açık temada ışık şeridi ve logo parlaması biraz daha belirgin */
 :root[data-theme="light"] .hero__stage {
   background:
-    radial-gradient(60% 55% at 50% 55%, rgba(254, 92, 29, calc(0.14 * var(--space, 1))), transparent 70%),
+    radial-gradient(60% 55% at 50% 55%, rgba(254, 92, 29, 0.14), transparent 70%),
     var(--bg);
 }
 
@@ -581,6 +585,7 @@
    katmanıyla veriyoruz (sadece opaklığı değişir, ucuz).
    ========================================================================== */
 @media (max-width: 700px) {
+  .hero { --run: 90vh; }
   .hero__logo { filter: none !important; }
   .hero__center::before {
     content: "";
@@ -595,4 +600,9 @@
     pointer-events: none;
     z-index: -1;
   }
+}
+
+/* Hareketi azalt: birleşme yok, hero tek ekran (telefon kuralından sonra gelmeli) */
+@media (prefers-reduced-motion: reduce) {
+  .hero { --run: 0px; }
 }

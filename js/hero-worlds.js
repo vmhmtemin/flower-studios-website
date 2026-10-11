@@ -38,7 +38,7 @@
 
   // Ayarlar
   const CFG = {
-    count: { desktop: 22, mobile: 10 },
+    count: { desktop: 22, mobile: 7 },
     formOnMobile: false,           // telefonda birleşme kapalı (performans)
     farBias: 1,                    // 1: derinlikler eşit dağılır (>1 olursa uzak/küçük parçalar çoğalır)
     // Derinliğe göre (uzak → yakın)
@@ -333,8 +333,7 @@
     /* ---------- Döngü ---------- */
     let visible = true;
     function tick(_, deltaMs) {
-      // Hero görünmüyorsa ya da uzay tamamen karardıysa çalışma
-      if (!visible || window.FS.heroSpace === 0) return;
+      if (!visible) return;   // hero ekranda değilse çalışma
       const dt = Math.min(deltaMs, 100) / 1000; // sekme dönüşünde büyük sıçrama olmasın
       par = window.scrollY * CFG.parallax;
       step(dt);
@@ -357,15 +356,14 @@
 
     if (reduce) return; // sabit dursun
 
-    // Açılışla birlikte belirsin (kapsayıcının opaklığı --space'e ait,
-    // bu yüzden giriş parçaların opaklığına çarpan olarak uygulanır)
+    // Açılışla birlikte belirsin (giriş, parçaların opaklığına çarpan
+    // olarak uygulanır)
     gsap.to(look, { fade: 1, duration: 2, delay: 0.3, ease: "power2.out" });
 
-    // Hero görünmüyorsa çalışma. Hero pin'lendiği için ölçü pin aralığını da
-    // içeren .pin-spacer üzerinden alınır.
+    // Hero görünmüyorsa çalışma
     const hero = stage.closest(".hero");
     ScrollTrigger.create({
-      trigger: hero.closest(".pin-spacer") || hero,
+      trigger: hero,
       start: "top bottom",
       end: "bottom top",
       onToggle: (self) => { visible = self.isActive; },

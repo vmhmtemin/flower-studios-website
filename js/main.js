@@ -94,7 +94,7 @@
        - Mobil menü açıkken ya da klavye odağı menüdeyken hep görünür. */
     const SHOW_AFTER = 60;
     const heroEnd = () => {
-      const h = document.querySelector(".pin-spacer") || document.querySelector(".hero");
+      const h = document.querySelector(".hero");
       return h ? h.offsetHeight : window.innerHeight;
     };
     let lastY = 0;

@@ -102,8 +102,11 @@
     const beam = hero.querySelector(".hero__beam");
     const center = hero.querySelector(".hero__center");
 
-    // Ekran genişliğine göre dağılma mesafesi
-    const spread = () => Math.min(window.innerWidth, 1400) / 1400;
+    // Ekran genişliğine göre dağılma mesafesi. Her karede okunmaz (pencere
+    // genişliğini okumak sayfa düzenini yeniden hesaplatabilir; telefonda
+    // kasmanın ana sebebiydi), sadece boyut değişince güncellenir.
+    let spreadVal = Math.min(window.innerWidth, 1400) / 1400;
+    const spread = () => spreadVal;
 
     // Parçaların "dağınık" konumları (logo birimi değil, piksel)
     const scattered = {
@@ -127,6 +130,16 @@
     const introT = { white: 0, top: 0, bottom: 0 };
     const scrollT = { white: 0, top: 0, bottom: 0 };
     keys.forEach((k) => gsap.set(pieces[k], { transformOrigin: "50% 50%" }));
+    // Hazır yazıcılar: her karede yeni GSAP nesnesi oluşturmaz
+    const set = {};
+    keys.forEach((k) => {
+      set[k] = {
+        x: gsap.quickSetter(pieces[k], "x"),
+        y: gsap.quickSetter(pieces[k], "y"),
+        r: gsap.quickSetter(pieces[k], "rotation"),
+        o: gsap.quickSetter(pieces[k], "opacity"),
+      };
+    });
 
     function render() {
       keys.forEach((k) => {
@@ -135,12 +148,10 @@
         const left = 1 - scrollT[k];        // 1 = dağınık, 0 = yerinde
         const far = 2.2 - 1.2 * i;          // açılışta 2.2× uzaktan gelir
         const farR = 2 - i;                 // açılışta 2× dönük gelir
-        gsap.set(pieces[k], {
-          x: s.x * far * left,
-          y: s.y * far * left,
-          rotation: s.rotate * farR * left,
-          opacity: i,
-        });
+        set[k].x(s.x * far * left);
+        set[k].y(s.y * far * left);
+        set[k].r(s.rotate * farR * left);
+        set[k].o(i);
       });
     }
     render();
@@ -154,10 +165,11 @@
       .from(chars, { yPercent: 115, rotate: 10, duration: 1.2, stagger: 0.035 }, 0.35)
       .from(hint, { opacity: 0, duration: 1 }, 1.2);
 
-    /* --- Kaydırma ile birleşme (pin + scrub) ---
-       Pin, diğer bölümlerin konum hesabını etkilediği için en başta
-       oluşturuluyor. Kullanıcı açılış bitmeden kaydırırsa açılış sadece
-       hızlanır; konumlar render() üzerinden aktığı için çakışma olmaz. */
+    /* --- Kaydırma ile birleşme ---
+       Sahne CSS "sticky" ile sabit; ilerleme = hero'nun ekrandan uzun
+       kısmında (--run) ne kadar kaydırıldığı. Kullanıcı açılış bitmeden
+       kaydırırsa açılış sadece hızlanır; konumlar render() üzerinden aktığı
+       için çakışma olmaz. */
     const skipIntro = () => intro.progress() < 1 && intro.timeScale(4);
     window.addEventListener("wheel", skipIntro, { once: true, passive: true });
     window.addEventListener("touchstart", skipIntro, { once: true, passive: true });
@@ -170,24 +182,14 @@
         scrollTrigger: {
           trigger: hero,
           start: "top top",
-          end: "+=120%",
-          pin: true,
-          scrub: 1,
-          anticipatePin: 1,
+          end: "bottom bottom",
+          // Telefonda parmak zaten akıcı kaydırır; gecikmeli takip kısa tutulur
+          scrub: window.matchMedia("(max-width: 700px)").matches ? 0.4 : 1,
           invalidateOnRefresh: true,
         },
       });
 
-      // Arkadaki uzay (süzülen parçalar + turuncu ışıma) kaydırdıkça kararır;
-      // son parça yerine oturduğu anda (1.16) tamamen sayfa rengindedir.
-      const space = { v: 1 };
-      const setSpace = () => {
-        stage.style.setProperty("--space", space.v.toFixed(3));
-        FS.heroSpace = space.v;
-      };
-
       tl.to(hint, { opacity: 0, duration: 0.1 }, 0)
-        .to(space, { v: 0, duration: 1.16, ease: "power1.in", onUpdate: setSpace }, 0)
         // Parçalar birleşiyor (her biri biraz farklı zamanlamayla)
         .to(scrollT, { white: 1, duration: 1, ease: "power2.inOut", onUpdate: render }, 0)
         .to(scrollT, { top: 1, duration: 1, ease: "power2.inOut", onUpdate: render }, 0.08)
@@ -209,12 +211,15 @@
         // Birleşmiş logo bir süre ekranda kalsın (boş tween = bekleme)
         .to({}, { duration: 0.4 });
 
-      // Pencere boyutu değişince (dağılma mesafesi ekrana bağlı) yeniden çiz
-      ScrollTrigger.addEventListener("refresh", render);
+      // Pencere boyutu değişince dağılma mesafesini güncelle ve yeniden çiz
+      ScrollTrigger.addEventListener("refresh", () => {
+        spreadVal = Math.min(window.innerWidth, 1400) / 1400;
+        render();
+      });
 
-      // Pin bittikten sonra: bir sonraki bölüm gelirken içerik parallax ile
-      // daha yavaş yukarı kayar ve söner (boş ekran kalmaz)
-      const next = hero.closest(".pin-spacer")?.nextElementSibling || hero.nextElementSibling;
+      // Birleşme bittikten sonra: bir sonraki bölüm gelirken içerik parallax
+      // ile daha yavaş yukarı kayar ve söner (boş ekran kalmaz)
+      const next = hero.nextElementSibling;
       if (next) {
         gsap.to(center, {
           yPercent: -35,
