@@ -308,8 +308,20 @@ html.lenis, html.lenis body { height: auto; }
 }
 .footer__row { row-gap: 40px; }
 .footer__brand { grid-column: 1 / 6; }
-.footer__brand svg { width: 34px; height: auto; margin-bottom: 18px; }
-.footer__brand p { color: var(--c-ash); max-width: 30ch; }
+.brand-lock {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  color: var(--c-white);
+}
+.brand-lock svg { width: auto; height: 64px; flex: none; }
+.brand-lock span {
+  font-family: "Kaushan Script", cursive;
+  font-size: 42px;
+  line-height: 0.9;
+  margin-bottom: 2px;   /* yazının taban çizgisi logonun ucuna otursun */
+  white-space: nowrap;
+}
 .footer__nav { grid-column: 7 / 10; }
 .footer__social { grid-column: 10 / 13; }
 .footer__nav h2,
