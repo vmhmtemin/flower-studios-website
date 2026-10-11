@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Flower Studios — Oyunlar ve Uygulamalar</title>
+  <meta name="description" content="Flower Studios, oyunlar ve uygulamalar geliştiren bağımsız bir stüdyo." />
+  <meta name="theme-color" content="#000000" />
+  <link rel="icon" href="assets/logo/flower-mark.svg" type="image/svg+xml" />
+
+  <!-- Fontlar -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/pages.css" />
+
+  <!-- Animasyon kütüphaneleri (sıra önemli: önce GSAP, sonra bizim scriptler) -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script defer src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
+  <script defer src="js/parallax.js"></script>
+  <script defer src="js/main.js"></script>
+</head>
+
+<body class="page-home">
+  <div class="progress" aria-hidden="true"></div>
+
+  <!-- ===================== NAVİGASYON ===================== -->
+  <header class="nav">
+    <div class="container nav__inner">
+      <a href="index.html" class="nav__brand" aria-label="Flower Studios ana sayfa">
+        <svg viewBox="0 0 415 650" aria-hidden="true">
+          <polygon fill="#fff" points="10,260 142,175 142,643" />
+          <polygon fill="#fe5c1d" points="154,167 405,8 377,138 154,265" />
+          <polygon fill="#fe5c1d" points="154,328 352,235 323,330 154,408" />
+        </svg>
+        <span>FLOWER STUDIOS</span>
+      </a>
+      <nav aria-label="Ana menü">
+        <ul class="nav__links">
+          <li><a href="index.html" aria-current="page">Ana Sayfa</a></li>
+          <li><a href="projects.html">Projeler</a></li>
+          <li><a href="about.html">Hakkında</a></li>
+          <li><a href="contact.html">İletişim</a></li>
+        </ul>
+      </nav>
+      <button class="nav__toggle" aria-label="Menüyü aç/kapat" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===================== HERO =====================
+         Kaydırdıkça logonun üç parçası farklı yönlerden gelip birleşir.
+         Bölüm, animasyon bitene kadar ekrana sabitlenir (pin). -->
+    <section class="hero" id="hero">
+      <div class="hero__stage">
+
+        <!-- Parallax arka plan parçacıkları (data-speed: ne kadar hızlı kaydığı) -->
+        <div class="hero__shards" aria-hidden="true">
+          <span class="shard shard--o" style="--x:8%;  --y:18%; --s:90px;  --r:-18deg" data-speed="1.6"></span>
+          <span class="shard shard--w" style="--x:82%; --y:12%; --s:46px;  --r:24deg"  data-speed="0.6"></span>
+          <span class="shard shard--o" style="--x:86%; --y:76%; --s:130px; --r:12deg"  data-speed="2.2"></span>
+          <span class="shard shard--w" style="--x:14%; --y:72%; --s:60px;  --r:-40deg" data-speed="1.1"></span>
+          <span class="shard shard--o" style="--x:62%; --y:84%; --s:34px;  --r:60deg"  data-speed="0.4"></span>
+          <span class="shard shard--w" style="--x:30%; --y:8%;  --s:28px;  --r:8deg"   data-speed="1.9"></span>
+          <span class="shard shard--o" style="--x:70%; --y:30%; --s:22px;  --r:-12deg" data-speed="0.8"></span>
+        </div>
+
+        <!-- Hero'nun arkasındaki dev çapraz turuncu şerit -->
+        <div class="hero__beam" aria-hidden="true"></div>
+
+        <div class="hero__center">
+          <!-- Logo: üç ayrı parça, JS ile birleştiriliyor -->
+          <svg class="hero__logo" viewBox="0 0 415 650" role="img" aria-label="Flower Studios logosu">
+            <polygon class="piece piece--white"  fill="#fff"    points="10,260 142,175 142,643" />
+            <polygon class="piece piece--top"    fill="#fe5c1d" points="154,167 405,8 377,138 154,265" />
+            <polygon class="piece piece--bottom" fill="#fe5c1d" points="154,328 352,235 323,330 154,408" />
+          </svg>
+
+          <h1 class="hero__title display">
+            <span class="hero__word" lang="en">FLOWER</span>
+            <span class="hero__word hero__word--accent" lang="en">STUDIOS</span>
+          </h1>
+
+          <p class="hero__tagline">Oyunlar ve uygulamalar. Cesur fikirler, keskin tasarım.</p>
+        </div>
+
+        <div class="hero__hint" aria-hidden="true">
+          <span>Kaydır</span>
+          <i></i>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== MANİFESTO =====================
+         Kaydırdıkça kelimeler sırayla aydınlanır. -->
+    <section class="manifesto">
+      <div class="container">
+        <span class="eyebrow" data-reveal>Biz kimiz</span>
+        <p class="manifesto__text" data-highlight>
+          Flower Studios oyunlar ve uygulamalar geliştiren bağımsız bir stüdyo.
+          Her projeye bir tohum gibi başlıyor, onu kendi dünyası olan,
+          akılda kalan bir deneyime dönüştürene kadar büyütüyoruz.
+        </p>
+      </div>
+    </section>
+
+    <!-- Bölümler arası açılı turuncu şerit geçişi -->
+    <div class="slash" aria-hidden="true">
+      <div class="slash__bar"></div>
+      <div class="slash__bar slash__bar--thin"></div>
+    </div>
+
+    <!-- ===================== PROJELER ===================== -->
+    <section class="projects" id="projects">
+      <div class="container">
+        <header class="section-head">
+          <span class="eyebrow" data-reveal>Projeler</span>
+          <h2 class="section-title display" data-reveal="words">Üzerinde çalıştığımız dünyalar</h2>
+        </header>
+
+        <div class="projects__list">
+
+          <!-- Proje 1: Remnant Protocol -->
+          <article class="project" data-reveal>
+            <a href="project.html?p=remnant-protocol" class="project__link">
+              <div class="project__media" aria-hidden="true">
+                <!-- Parallax katmanlı illüstrasyon -->
+                <div class="art art--remnant">
+                  <div class="art__layer art__sky" data-depth="0.15"></div>
+                  <div class="art__layer art__ruins-back" data-depth="0.3"></div>
+                  <div class="art__layer art__ruins-front" data-depth="0.55"></div>
+                  <div class="art__layer art__blade" data-depth="0.8"></div>
+                  <div class="art__layer art__code" data-depth="0.4">VAEL-1 // ONLINE</div>
+                </div>
+              </div>
+              <div class="project__body">
+                <div class="project__meta">
+                  <span class="tag tag--live">Geliştiriliyor · Prototip</span>
+                  <span class="project__genre">2D Roguelite Platformer</span>
+                </div>
+                <h3 class="project__title display" lang="en">Remnant Protocol</h3>
+                <p class="project__desc">
+                  Dünya düştü. Geriye kalanlar ise unutmadı. En güçlü savaş androidi VAEL-1,
+                  hafızası silinmiş halde uyanır. Bilinci ise hâlâ yerinde. Enerji kılıcını kuşan,
+                  öl, yeniden doğ ve gerçeği parça parça geri al.
+                </p>
+                <span class="project__more">Projeyi incele
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+                </span>
+              </div>
+            </a>
+          </article>
+
+          <!-- Proje 2: Living Promise -->
+          <article class="project project--reverse" data-reveal>
+            <a href="project.html?p=living-promise" class="project__link">
+              <div class="project__media" aria-hidden="true">
+                <div class="art art--promise">
+                  <div class="art__layer art__night" data-depth="0.1"></div>
+                  <div class="art__layer art__island art__island--far" data-depth="0.25"></div>
+                  <div class="art__layer art__island art__island--mid" data-depth="0.45"></div>
+                  <div class="art__layer art__sea" data-depth="0.2"></div>
+                  <!-- Canon: NPC'ler beyaz gözleri parlayan siyah silüetler -->
+                  <div class="art__layer art__figure" data-depth="0.7"><i></i><i></i></div>
+                </div>
+              </div>
+              <div class="project__body">
+                <div class="project__meta">
+                  <span class="tag">Konsept Aşaması</span>
+                  <span class="project__genre">Birinci Şahıs · Atmosferik</span>
+                </div>
+                <h3 class="project__title display" lang="en">Living Promise</h3>
+                <p class="project__desc">
+                  Okyanusun üzerinde yüzen dev adalar. Herkesi izleyen bir hükümet. Kızının öldüğü
+                  söylenen bir baba. Megard Fairweather sıradan bir balıkçıydı. Ta ki IGF, Ivy'nin artık
+                  yaşamadığını söyleyene kadar. Ama bazı sözler, yalandan daha güçlüdür.
+                </p>
+                <span class="project__more">Projeyi incele
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+                </span>
+              </div>
+            </a>
+          </article>
+        </div>
+
+        <div class="projects__cta" data-reveal>
+          <a href="projects.html" class="btn btn--ghost">Tüm projeler
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== KAYAN ŞERİT (marquee) =====================
+         Kaydırma yönüne göre iki satır zıt yönde akar. -->
+    <section class="marquee" aria-hidden="true">
+      <div class="marquee__row" data-marquee="-1">
+        <span>OYUNLAR</span><b></b><span>UYGULAMALAR</span><b></b><span>DÜNYALAR</span><b></b>
+        <span>OYUNLAR</span><b></b><span>UYGULAMALAR</span><b></b><span>DÜNYALAR</span><b></b>
+      </div>
+      <div class="marquee__row marquee__row--outline" data-marquee="1">
+        <span>FLOWER STUDIOS</span><b></b><span>FLOWER STUDIOS</span><b></b>
+        <span>FLOWER STUDIOS</span><b></b><span>FLOWER STUDIOS</span><b></b>
+      </div>
+    </section>
+
+    <!-- ===================== NE YAPIYORUZ ===================== -->
+    <section class="services">
+      <div class="container">
+        <header class="section-head">
+          <span class="eyebrow" data-reveal>Ne yapıyoruz</span>
+          <h2 class="section-title display" data-reveal="words">İki alan, tek bir tutku</h2>
+        </header>
+
+        <div class="services__grid">
+          <article class="service" data-reveal>
+            <span class="service__num">01</span>
+            <h3 class="service__title display">Oyunlar</h3>
+            <p>Atmosferik dünyalar, sıkı oynanış ve hikâyesi olan karakterler. Unity ile geliştirdiğimiz,
+              oyuncunun aklında kalan deneyimler.</p>
+            <ul class="service__list">
+              <li>Hikâye odaklı oyunlar</li>
+              <li>Aksiyon ve roguelite</li>
+              <li>Prototipten yayına</li>
+            </ul>
+          </article>
+
+          <article class="service" data-reveal data-delay="0.12">
+            <span class="service__num">02</span>
+            <h3 class="service__title display">Uygulamalar</h3>
+            <p>Gündelik hayatı kolaylaştıran, sade ve hızlı araçlar. Gereksiz karmaşa yok,
+              sadece işini iyi yapan tasarım.</p>
+            <ul class="service__list">
+              <li>Mobil ve web uygulamaları</li>
+              <li>Kullanıcı odaklı arayüzler</li>
+              <li>Akıllı araçlar</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== CTA =====================
+         Arka planda logonun dev turuncu şeritleri parallax ile kayar. -->
+    <section class="cta">
+      <div class="cta__bg" aria-hidden="true">
+        <span class="cta__stripe cta__stripe--1" data-speed="-1.2"></span>
+        <span class="cta__stripe cta__stripe--2" data-speed="-0.5"></span>
+      </div>
+      <div class="container cta__inner">
+        <span class="eyebrow" data-reveal>Bir fikrin mi var?</span>
+        <h2 class="cta__title display" data-reveal="words">Bir sonraki dünyayı birlikte inşa edelim</h2>
+        <div data-reveal data-delay="0.2">
+          <a href="contact.html" class="btn">İletişime geç
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__giant" aria-hidden="true">FLOWER STUDIOS</div>
+      <div class="footer__top">
+        <div class="footer__brand">
+          <svg viewBox="0 0 415 650" aria-hidden="true">
+            <polygon fill="#fff" points="10,260 142,175 142,643" />
+            <polygon fill="#fe5c1d" points="154,167 405,8 377,138 154,265" />
+            <polygon fill="#fe5c1d" points="154,328 352,235 323,330 154,408" />
+          </svg>
+          <p>Oyunlar ve uygulamalar geliştiren bağımsız bir stüdyo.</p>
+        </div>
+        <div class="footer__cols">
+          <div class="footer__col">
+            <h4>Site</h4>
+            <ul>
+              <li><a href="projects.html">Projeler</a></li>
+              <li><a href="about.html">Hakkında</a></li>
+              <li><a href="contact.html">İletişim</a></li>
+            </ul>
+          </div>
+          <div class="footer__col">
+            <h4>Takip et</h4>
+            <ul>
+              <!-- TODO: gerçek sosyal medya bağlantılarını ekle -->
+              <li><a href="#">Instagram</a></li>
+              <li><a href="#">X / Twitter</a></li>
+              <li><a href="https://github.com/vmhmtemin">GitHub</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <span>© <span id="year">2026</span> Flower Studios</span>
+        <span>Oyunlar · Uygulamalar</span>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

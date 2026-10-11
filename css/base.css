@@ -1,0 +1,300 @@
+/* ==========================================================================
+   Flower Studios — base.css
+   Tüm sayfaların ortak kullandığı stiller: renk değişkenleri, tipografi,
+   navigasyon, butonlar, footer ve yardımcı sınıflar.
+   ========================================================================== */
+
+/* ---------- 1. Tasarım değişkenleri (logodan alınan renkler) ---------- */
+:root {
+  --c-bg: #000000;          /* ana zemin */
+  --c-bg-2: #0a0a0a;        /* bölüm zemini */
+  --c-bg-3: #131313;        /* kart zemini */
+  --c-line: #262626;        /* ince çizgiler */
+  --c-white: #ffffff;
+  --c-muted: #9a9a9a;       /* ikincil metin */
+  --c-orange: #fe5c1d;      /* logo turuncusu */
+  --c-orange-dim: #b8410f;
+
+  --f-display: "Montserrat", system-ui, sans-serif;
+  --f-body: "Inter", system-ui, sans-serif;
+
+  --gutter: clamp(16px, 4vw, 56px);
+  --max-w: 1320px;
+  --nav-h: 76px;
+
+  /* logodaki eğim açısı — tüm açılı kesimlerde bu kullanılır */
+  --slant: 6deg;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---------- 2. Reset ---------- */
+*,
+*::before,
+*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  background: var(--c-bg);
+  color: var(--c-white);
+  font-family: var(--f-body);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+::selection { background: var(--c-orange); color: var(--c-bg); }
+
+/* Lenis yumuşak kaydırma için gerekli kurallar */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* ---------- 3. Tipografi ---------- */
+.display {
+  font-family: var(--f-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 0.95;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--f-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--c-orange);
+}
+/* başlık önündeki küçük eğik şerit */
+.eyebrow::before {
+  content: "";
+  width: 28px;
+  height: 8px;
+  background: var(--c-orange);
+  clip-path: polygon(0 60%, 100% 0, 92% 100%, 0 100%);
+}
+
+.container {
+  width: 100%;
+  max-width: var(--max-w);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* ---------- 4. Scroll ilerleme çubuğu ---------- */
+.progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--c-orange);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  z-index: 200;
+}
+
+/* ---------- 5. Navigasyon ---------- */
+.nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: var(--nav-h);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  transition: background 0.4s, border-color 0.4s, transform 0.5s var(--ease-out);
+  border-bottom: 1px solid transparent;
+}
+.nav.is-scrolled {
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-color: var(--c-line);
+}
+.nav.is-hidden { transform: translateY(-100%); }
+
+.nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.16em;
+}
+.nav__brand svg { width: 22px; height: auto; }
+
+.nav__links { display: flex; gap: 40px; list-style: none; }
+.nav__links a {
+  position: relative;
+  font-family: var(--f-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+  transition: color 0.3s;
+}
+.nav__links a::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: -6px;
+  width: 100%; height: 2px;
+  background: var(--c-orange);
+  transform: scaleX(0) skewX(-30deg);
+  transform-origin: left;
+  transition: transform 0.4s var(--ease-out);
+}
+.nav__links a:hover,
+.nav__links a[aria-current="page"] { color: var(--c-white); }
+.nav__links a:hover::after,
+.nav__links a[aria-current="page"]::after { transform: scaleX(1) skewX(-30deg); }
+
+/* Mobil menü butonu */
+.nav__toggle { display: none; width: 40px; height: 40px; position: relative; }
+.nav__toggle span {
+  position: absolute; left: 8px; right: 8px; height: 2px;
+  background: var(--c-white);
+  transition: transform 0.4s var(--ease-out), opacity 0.3s;
+}
+.nav__toggle span:nth-child(1) { top: 14px; }
+.nav__toggle span:nth-child(2) { top: 24px; right: 16px; background: var(--c-orange); }
+.nav-open .nav__toggle span:nth-child(1) { transform: translateY(5px) rotate(45deg); }
+.nav-open .nav__toggle span:nth-child(2) { transform: translateY(-5px) rotate(-45deg); right: 8px; }
+
+@media (max-width: 760px) {
+  .nav__toggle { display: block; z-index: 2; }
+  .nav__links {
+    position: fixed;
+    inset: 0;
+    flex-direction: column;
+    justify-content: center;
+    padding-inline: var(--gutter);
+    gap: 28px;
+    background: var(--c-bg);
+    clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
+    transition: clip-path 0.7s var(--ease-out);
+  }
+  .nav__links a { font-size: 30px; letter-spacing: 0.08em; color: var(--c-white); }
+  .nav-open .nav__links { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+}
+
+/* ---------- 6. Butonlar ---------- */
+.btn {
+  --btn-bg: var(--c-orange);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 34px;
+  font-family: var(--f-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--c-bg);
+  background: var(--btn-bg);
+  /* logodaki gibi eğik kenarlar */
+  clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+  overflow: hidden;
+  isolation: isolate;
+}
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--c-white);
+  transform: translateX(-102%) skewX(-20deg);
+  transition: transform 0.5s var(--ease-out);
+  z-index: -1;
+}
+.btn:hover::before { transform: translateX(0) skewX(0); }
+.btn svg { width: 18px; transition: transform 0.4s var(--ease-out); }
+.btn:hover svg { transform: translateX(4px); }
+
+.btn--ghost {
+  color: var(--c-white);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--c-line);
+}
+.btn--ghost:hover { color: var(--c-bg); }
+
+/* ---------- 7. Footer ---------- */
+.footer {
+  position: relative;
+  padding-block: 80px 40px;
+  border-top: 1px solid var(--c-line);
+  background: var(--c-bg);
+}
+.footer__top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 40px;
+  margin-bottom: 64px;
+}
+.footer__brand svg { width: 44px; margin-bottom: 18px; }
+.footer__brand p { color: var(--c-muted); max-width: 320px; font-size: 15px; }
+.footer__cols { display: flex; gap: 72px; flex-wrap: wrap; }
+.footer__col h4 {
+  font-family: var(--f-display);
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--c-orange);
+  margin-bottom: 18px;
+}
+.footer__col ul { list-style: none; display: grid; gap: 10px; }
+.footer__col a { color: var(--c-muted); font-size: 15px; transition: color 0.3s; }
+.footer__col a:hover { color: var(--c-white); }
+.footer__bottom {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-top: 28px;
+  border-top: 1px solid var(--c-line);
+  font-size: 13px;
+  color: var(--c-muted);
+}
+/* Footer'daki dev, yarı saydam isim */
+.footer__giant {
+  font-family: var(--f-display);
+  font-weight: 800;
+  font-size: min(10.4vw, 150px);
+  line-height: 0.8;
+  letter-spacing: -0.02em;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--c-line);
+  white-space: nowrap;
+  margin-bottom: 48px;
+  user-select: none;
+}
+
+/* ---------- 8. Animasyon yardımcıları ---------- */
+/* JS yüklenmeden önce görünmesin, yüklenince GSAP gösterir */
+.js [data-reveal] { opacity: 0; }
+
+/* Kelime/harf ayırma için kullanılan maske */
+.split-mask { display: inline-block; overflow: hidden; vertical-align: top; }
+.split-item { display: inline-block; will-change: transform; }
+
+/* "Hareketi azalt" ayarı açık kullanıcılar için her şey sabit */
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal] { opacity: 1; }
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
