@@ -98,7 +98,6 @@
     const words = hero.querySelectorAll(".hero__word");
     const chars = [];
     words.forEach((w) => chars.push(...FS.split(w, "chars")));
-    const tagline = hero.querySelector(".hero__tagline");
     const hint = hero.querySelector(".hero__hint");
     const beam = hero.querySelector(".hero__beam");
     const center = hero.querySelector(".hero__center");
@@ -129,7 +128,6 @@
     });
     intro
       .from(chars, { yPercent: 115, rotate: 10, duration: 1.2, stagger: 0.035 }, 0.35)
-      .from(tagline, { opacity: 0, y: 20, duration: 1 }, 0.9)
       .from(hint, { opacity: 0, duration: 1 }, 1.2);
 
     // Pencere boyutu değişince yeniden hesaplanan (fonksiyon tabanlı) değerler
