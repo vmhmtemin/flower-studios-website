@@ -316,16 +316,14 @@ html.lenis, html.lenis body { height: auto; }
 }
 .footer__row { row-gap: 40px; }
 .footer__brand { grid-column: 1 / 6; }
-/* Logo kilidi: F logosu, "lower" el yazısı (Saithik), "Studios" Montserrat.
-   --lock-h logonun yüksekliği. Saithik ölçüleri (em):
-     "l": tepe 0.811, taban çizgisinin altına 0.19 sarkar → toplam ≈ 1.0em
-     gövde (x) yüksekliği ≈ 0.28
-   Kural: "l" hiçbir zaman logodan büyük olmaz.
-   - Yazı boyutu 0.85 × logo → "l" logonun ~%87'si kadar
-   - Satır 0.16 × logo yukarı kaydırılır → "l"nin alt ucu F'nin ucuna değer
-   - "Studios" aynı satırda; küçük harfleri "lower"ın gövdesiyle aynı boyda */
+/* Logo kilidi: F logosu, "lower" el yazısı (Saithik), "STUDIOS" Montserrat.
+   Saithik "l": tepe 0.811em, taban çizgisinin altına 0.19em sarkar.
+   - "lower" 30px → "l" ≈ 30px, logonun (56px) içinde kalır
+   - Satır 0.19em yukarı kaydırılır → "l"nin alt ucu F'nin ucuna değer
+   - "STUDIOS" aynı satırda */
 .brand-lock {
   --lock-h: 56px;
+  --script: 30px;
   display: inline-flex;
   align-items: baseline;
   white-space: nowrap;
@@ -336,22 +334,19 @@ html.lenis, html.lenis body { height: auto; }
 .brand-lock__script,
 .brand-lock__word {
   position: relative;
-  top: calc(var(--lock-h) * -0.16);
+  top: calc(var(--script) * -0.19);
 }
 .brand-lock__script {
   font-family: "Saithik", "Yellowtail", cursive;
-  font-size: calc(var(--lock-h) * 0.85);
-  margin-left: calc(var(--lock-h) * 0.01);
+  font-size: var(--script);
+  margin-left: 2px;
 }
 .brand-lock__word {
   font-family: var(--f-display);
   font-weight: 700;
-  font-size: calc(var(--lock-h) * 0.46);
-  letter-spacing: 0.01em;
-  margin-left: calc(var(--lock-h) * 0.16);
-}
-@media (max-width: 480px) {
-  .brand-lock { --lock-h: 48px; }
+  font-size: 16px;
+  letter-spacing: 0.12em;
+  margin-left: 10px;
 }
 .footer__nav { grid-column: 7 / 10; }
 .footer__social { grid-column: 10 / 13; }
