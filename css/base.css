@@ -316,26 +316,36 @@ html.lenis, html.lenis body { height: auto; }
 }
 .footer__row { row-gap: 40px; }
 .footer__brand { grid-column: 1 / 6; }
+/* Logo kilidi: F logosu büyük harf gibi davranır.
+   --lock-h logonun yüksekliği; diğer ölçüler fontların gerçek
+   ölçülerinden hesaplandı:
+   - Saithik "l" tepesi 0.811em → tepe F'nin tepesine oturur (×1.205)
+   - Saithik gövde (x) yüksekliği ≈ 0.28em; Montserrat büyük harf 0.70em
+     → STUDIOS'un büyük harfleri el yazısının gövdesiyle aynı boyda (×0.48)
+   - Hepsi aynı taban çizgisinde; F'nin alt ucu da bu çizgide. */
 .brand-lock {
+  --lock-h: 56px;
   display: inline-flex;
-  white-space: nowrap;
-  /* "lower" ve "STUDIOS" aynı taban çizgisinde; logonun alt ucu da bu çizgide */
   align-items: baseline;
-  gap: 2px;
+  white-space: nowrap;
   color: var(--c-white);
   line-height: 1;
 }
-.brand-lock svg { width: auto; height: 64px; flex: none; }
+.brand-lock svg { width: auto; height: var(--lock-h); flex: none; }
 .brand-lock__script {
   font-family: "Saithik", "Yellowtail", cursive;
-  font-size: 58px;
+  font-size: calc(var(--lock-h) * 1.205);
+  margin-left: calc(var(--lock-h) * -0.02);
 }
 .brand-lock__word {
   font-family: var(--f-display);
   font-weight: 700;
-  font-size: 20px;
-  letter-spacing: 0.12em;
-  margin-left: 12px;
+  font-size: calc(var(--lock-h) * 0.48);
+  letter-spacing: 0.1em;
+  margin-left: calc(var(--lock-h) * 0.22);
+}
+@media (max-width: 480px) {
+  .brand-lock { --lock-h: 48px; }
 }
 .footer__nav { grid-column: 7 / 10; }
 .footer__social { grid-column: 10 / 13; }
