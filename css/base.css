@@ -308,10 +308,10 @@ html.lenis, html.lenis body { height: auto; }
 }
 .footer__row { row-gap: 40px; }
 .footer__brand { grid-column: 1 / 6; }
-/* Logo kilidi: F logosu + STUDIOS, aynı boyda.
-   F'nin görünen yüksekliği logonun %97.7'si (viewBox 8 → 643 / 650).
-   Montserrat büyük harf yüksekliği 0.70em → font-size = 0.977 / 0.70 ≈ 1.396 × logo.
-   Taban çizgisi F'nin ucunda, harflerin tepesi F'nin tepesinde. */
+/* Logo kilidi: F logosu + STUDIOS.
+   STUDIOS'un büyük harf yüksekliği logonun yarısı:
+   0.5 × 0.977 (F'nin görünen yüksekliği) / 0.70 (Montserrat büyük harf) ≈ 0.698 × logo.
+   Taban çizgisi F'nin ucunda. */
 .brand-lock {
   --lock-h: 56px;
   display: inline-flex;
@@ -324,9 +324,9 @@ html.lenis, html.lenis body { height: auto; }
 .brand-lock__word {
   font-family: var(--f-display);
   font-weight: 700;
-  font-size: calc(var(--lock-h) * 1.396);
-  letter-spacing: 0.04em;
-  margin-left: calc(var(--lock-h) * 0.22);
+  font-size: calc(var(--lock-h) * 0.698);
+  letter-spacing: 0.08em;
+  margin-left: calc(var(--lock-h) * 0.2);
 }
 @media (max-width: 480px) {
   .brand-lock { --lock-h: 38px; }
