@@ -8,7 +8,7 @@
    - Tek SVG katmanı, tek döngü (gsap.ticker). Her parçanın konumunu sadece
      render() yazar; birleşme/dağılma tween'leri parça nesnesinin
      değerlerini değiştirir (ışınlanma olmaz).
-   - Aynı anda en fazla bir birleşme.
+   - Aynı anda en fazla iki birleşme; birbirlerinden uzak noktalarda.
    - Hero ekranda değilken ve sekme arka plandayken çalışmaz.
    - "Hareketi azalt" açıksa parçalar sabit durur, birleşme olmaz.
    ========================================================================== */
@@ -29,19 +29,20 @@
 
   // Ayarlar
   const CFG = {
-    count: { desktop: 16, mobile: 9 },
+    count: { desktop: 18, mobile: 12 },
     scale: [0.05, 0.22],           // parça boyu (logoya oranla)
     speed: [6, 18],                // px/sn
     spin: 7,                       // derece/sn (±)
     opacity: { white: [0.1, 0.2], orange: [0.25, 0.5] },
     formScale: { desktop: 0.15, mobile: 0.1 },   // birleşen F'nin boyu
-    formEvery: [4.5, 8],           // sn — birleşmeler arası bekleme
+    formEvery: [1, 2.5],           // sn — birleşmeler arası bekleme
+    maxForming: 2,                 // aynı anda en fazla kaç F
+    minGap: { desktop: 260, mobile: 150 },   // iki F arasındaki en az mesafe (px)
     formIn: 1.8, hold: 1.6, formOut: 1.3,
     parallax: 0.35,                // kaydırmada derinliğe göre yukarı kayma
   };
 
   const rand = (a, b) => a + Math.random() * (b - a);
-  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
   document.addEventListener("fs:ready", init);
 
@@ -150,15 +151,19 @@
     }
 
     /* ---------- Birleşme: üç parça bir F olur, durur, dağılır ---------- */
-    let forming = false;
-    let nextForm = rand(2.5, 4); // ilk birleşme açılıştan kısa süre sonra
+    let forming = 0;             // şu an birleşmekte olan F sayısı
+    const spots = [];            // aktif birleşme noktaları
+    const timelines = new Set(); // aktif birleşme zaman çizelgeleri
+    let nextForm = rand(1.2, 2); // ilk birleşme açılıştan kısa süre sonra
 
     function findSpot() {
       const m = mobile ? 50 : 90;
       for (let i = 0; i < 40; i++) {
         const x = rand(m, W - m);
         const y = rand(m + 40, H - m);
-        if (!inAvoid(x, y)) return [x, y];
+        const gap = mobile ? CFG.minGap.mobile : CFG.minGap.desktop;
+        const far = spots.every(([sx, sy]) => (sx - x) ** 2 + (sy - y) ** 2 > gap * gap);
+        if (!inAvoid(x, y) && far) return [x, y];
       }
       return null;
     }
@@ -180,16 +185,19 @@
       });
       if (trio.some((p) => !p)) return;
 
-      forming = true;
+      forming++;
+      spots.push(spot);
       const S = mobile ? CFG.formScale.mobile : CFG.formScale.desktop;
       const tl = gsap.timeline({
         onComplete: () => {
           trio.forEach((p) => { p.mode = "drift"; });
-          forming = false;
-          nextForm = rand(CFG.formEvery[0], CFG.formEvery[1]);
+          forming--;
+          spots.splice(spots.indexOf(spot), 1);
+          timelines.delete(tl);
         },
       });
 
+      timelines.add(tl);
       trio.forEach((p) => {
         p.mode = "form";
         const c = SHAPES[p.type].c;
@@ -235,9 +243,12 @@
       const dt = Math.min(deltaMs, 100) / 1000; // sekme dönüşünde büyük sıçrama olmasın
       par = window.scrollY * CFG.parallax;
       step(dt);
-      if (!forming) {
+      if (forming < CFG.maxForming) {
         nextForm -= dt;
-        if (nextForm <= 0) form();
+        if (nextForm <= 0) {
+          form();
+          nextForm = rand(CFG.formEvery[0], CFG.formEvery[1]);
+        }
       }
       render();
     }
@@ -274,9 +285,12 @@
       lastW = window.innerWidth;
       clearTimeout(init._t);
       init._t = setTimeout(() => {
+        timelines.forEach((t) => t.kill());
+        timelines.clear();
         gsap.killTweensOf(parts);
-        forming = false;
-        nextForm = rand(2, 4);
+        forming = 0;
+        spots.length = 0;
+        nextForm = rand(1, 2);
         build();
         render();
       }, 200);
