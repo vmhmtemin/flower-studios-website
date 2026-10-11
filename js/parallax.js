@@ -215,16 +215,6 @@
         });
       }
 
-      // Arka plan parçacıkları pin süresince kendi hızlarında yukarı kayar
-      hero.querySelectorAll(".shard").forEach((el) => {
-        const speed = parseFloat(el.dataset.speed || 1);
-        gsap.to(el, {
-          y: () => -speed * window.innerHeight * 0.45,
-          rotate: `+=${speed * 25}`,
-          ease: "none",
-          scrollTrigger: { trigger: hero, start: "top top", end: "bottom+=120% top", scrub: true },
-        });
-      });
     }
   }
 

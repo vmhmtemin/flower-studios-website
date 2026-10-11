@@ -70,19 +70,17 @@
 }
 
 /* Arka plan parçacıkları — logodaki üçgen formun küçük kopyaları */
-.hero__shards { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
-.shard {
+.hero__worlds {
   position: absolute;
-  left: var(--x);
-  top: var(--y);
-  width: var(--s);
-  height: calc(var(--s) * 0.55);
-  transform: rotate(var(--r));
-  clip-path: polygon(0 45%, 100% 0, 89% 55%, 0 100%);
-  will-change: transform;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  overflow: visible;
 }
-.shard--o { background: var(--c-orange); opacity: 0.55; }
-.shard--w { background: var(--fg); opacity: 0.16; }
+.hero__worlds .wp--white { fill: var(--fg); }
+.hero__worlds .wp--orange { fill: var(--c-orange); }
 
 /* Hero arkasındaki dev çapraz şerit */
 .hero__beam {
