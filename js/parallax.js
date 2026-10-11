@@ -116,39 +116,48 @@
     // tarayıcı açıyı kaybettiği için)
     gsap.set(beam, { rotate: -24, scaleX: 0, transformOrigin: "0% 50%" });
 
+    /* --- Parçaların konumu: TEK YAZICI ---
+       Açılış ve kaydırma parçalara doğrudan konum yazmaz; ikisi de sadece
+       kendi ilerleme değerini (0–1) günceller. Parçanın nerede duracağını
+       render() ikisini birleştirerek tek yerden hesaplar. Böylece açılış
+       bitmeden kaydırılsa da, pencere boyutu değişse de parça zıplamaz.
+         introT  0 → 1 : uzaktan (2.2×) dağınık konuma gelir, görünür olur
+         scrollT 0 → 1 : dağınık konumdan yerine (0,0,0) oturur          */
+    const keys = Object.keys(pieces);
+    const introT = { white: 0, top: 0, bottom: 0 };
+    const scrollT = { white: 0, top: 0, bottom: 0 };
+    keys.forEach((k) => gsap.set(pieces[k], { transformOrigin: "50% 50%" }));
+
+    function render() {
+      keys.forEach((k) => {
+        const s = scattered[k]();
+        const i = introT[k];
+        const left = 1 - scrollT[k];        // 1 = dağınık, 0 = yerinde
+        const far = 2.2 - 1.2 * i;          // açılışta 2.2× uzaktan gelir
+        const farR = 2 - i;                 // açılışta 2× dönük gelir
+        gsap.set(pieces[k], {
+          x: s.x * far * left,
+          y: s.y * far * left,
+          rotation: s.rotate * farR * left,
+          opacity: i,
+        });
+      });
+    }
+    render();
+
     /* --- Açılış animasyonu (sayfa yüklenince bir kez) --- */
     const intro = gsap.timeline({ defaults: { ease: "expo.out" } });
-    Object.keys(pieces).forEach((k, i) => {
-      intro.fromTo(
-        pieces[k],
-        { ...scaledFar(scattered[k]()), opacity: 0 },
-        { ...scattered[k](), opacity: 1, duration: 1.6 },
-        0.1 + i * 0.12
-      );
+    keys.forEach((k, idx) => {
+      intro.to(introT, { [k]: 1, duration: 1.6, onUpdate: render }, 0.1 + idx * 0.12);
     });
     intro
       .from(chars, { yPercent: 115, rotate: 10, duration: 1.2, stagger: 0.035 }, 0.35)
       .from(hint, { opacity: 0, duration: 1 }, 1.2);
 
-    // Pencere boyutu değişince yeniden hesaplanan (fonksiyon tabanlı) değerler
-    function live(k) {
-      return {
-        x: () => scattered[k]().x,
-        y: () => scattered[k]().y,
-        rotate: () => scattered[k]().rotate,
-      };
-    }
-
-    // Dağınık konumun 2.2 katı uzaktan başla
-    function scaledFar(p) {
-      return { x: p.x * 2.2, y: p.y * 2.2, rotate: p.rotate * 2 };
-    }
-
     /* --- Kaydırma ile birleşme (pin + scrub) ---
        Pin, diğer bölümlerin konum hesabını etkilediği için en başta
-       oluşturuluyor. Parça animasyonları immediateRender:false ile
-       açılış animasyonunu bozmadan bekler. Kullanıcı açılış bitmeden
-       kaydırırsa açılış hızlandırılır. */
+       oluşturuluyor. Kullanıcı açılış bitmeden kaydırırsa açılış sadece
+       hızlanır; konumlar render() üzerinden aktığı için çakışma olmaz. */
     const skipIntro = () => intro.progress() < 1 && intro.timeScale(4);
     window.addEventListener("wheel", skipIntro, { once: true, passive: true });
     window.addEventListener("touchstart", skipIntro, { once: true, passive: true });
@@ -171,9 +180,9 @@
 
       tl.to(hint, { opacity: 0, duration: 0.1 }, 0)
         // Parçalar birleşiyor (her biri biraz farklı zamanlamayla)
-        .fromTo(pieces.white, live("white"), { x: 0, y: 0, rotate: 0, duration: 1, ease: "power2.inOut", immediateRender: false }, 0)
-        .fromTo(pieces.top, live("top"), { x: 0, y: 0, rotate: 0, duration: 1, ease: "power2.inOut", immediateRender: false }, 0.08)
-        .fromTo(pieces.bottom, live("bottom"), { x: 0, y: 0, rotate: 0, duration: 1, ease: "power2.inOut", immediateRender: false }, 0.16)
+        .to(scrollT, { white: 1, duration: 1, ease: "power2.inOut", onUpdate: render }, 0)
+        .to(scrollT, { top: 1, duration: 1, ease: "power2.inOut", onUpdate: render }, 0.08)
+        .to(scrollT, { bottom: 1, duration: 1, ease: "power2.inOut", onUpdate: render }, 0.16)
         // Birleşme anında ışık şeridi ekranı çapraz keser
         .to(beam, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 0.75)
         .fromTo(
@@ -184,6 +193,9 @@
         )
         // Birleşmiş logo bir süre ekranda kalsın (boş tween = bekleme)
         .to({}, { duration: 0.4 });
+
+      // Pencere boyutu değişince (dağılma mesafesi ekrana bağlı) yeniden çiz
+      ScrollTrigger.addEventListener("refresh", render);
 
       // Pin bittikten sonra: bir sonraki bölüm gelirken içerik parallax ile
       // daha yavaş yukarı kayar ve söner (boş ekran kalmaz)
