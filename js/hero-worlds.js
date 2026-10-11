@@ -34,10 +34,15 @@
     speed: [6, 18],                // px/sn
     spin: 7,                       // derece/sn (±)
     opacity: { white: [0.1, 0.2], orange: [0.25, 0.5] },
-    formScale: { desktop: 0.15, mobile: 0.1 },   // birleşen F'nin boyu
+    // Birleşen F'nin boyu: uzak (z=0) → yakın (z=1). Uzaktakiler küçük,
+    // daha saydam ve kaydırmada daha yavaş: derinlik hissi.
+    formScale: { desktop: [0.035, 0.15], mobile: [0.025, 0.1] },
+    formOpacity: { white: [0.1, 0.38], orange: [0.2, 0.72] },
+    formDepth: [0.35, 1.1],        // parallax derinliği (uzak → yakın)
+    farBias: 1.8,                  // >1: uzak/küçük birleşmeler daha sık
     formEvery: [1, 2.5],           // sn — birleşmeler arası bekleme
-    maxForming: 2,                 // aynı anda en fazla kaç F
-    minGap: { desktop: 260, mobile: 150 },   // iki F arasındaki en az mesafe (px)
+    maxForming: 3,                 // aynı anda en fazla kaç F
+    gapPad: 40,                    // iki F'nin kenarları arasındaki en az boşluk (px)
     formIn: 1.8, hold: 1.6, formOut: 1.3,
     parallax: 0.35,                // kaydırmada derinliğe göre yukarı kayma
   };
@@ -156,20 +161,26 @@
     const timelines = new Set(); // aktif birleşme zaman çizelgeleri
     let nextForm = rand(1.2, 2); // ilk birleşme açılıştan kısa süre sonra
 
-    function findSpot() {
-      const m = mobile ? 50 : 90;
+    // rad: F'nin yarıçapı (px). Kenardan ve diğer F'lerden bu kadar uzak dur.
+    function findSpot(rad) {
+      const m = rad + (mobile ? 20 : 40);
       for (let i = 0; i < 40; i++) {
         const x = rand(m, W - m);
         const y = rand(m + 40, H - m);
-        const gap = mobile ? CFG.minGap.mobile : CFG.minGap.desktop;
-        const far = spots.every(([sx, sy]) => (sx - x) ** 2 + (sy - y) ** 2 > gap * gap);
-        if (!inAvoid(x, y) && far) return [x, y];
+        const clear = spots.every(([sx, sy, sr]) => Math.hypot(sx - x, sy - y) > sr + rad + CFG.gapPad);
+        if (!inAvoid(x, y) && clear) return [x, y, rad];
       }
       return null;
     }
 
+    const lerp = (a, b, t) => a + (b - a) * t;
+
     function form() {
-      const spot = findSpot();
+      // Bu F ne kadar yakın? (0 uzak, 1 yakın) — uzak olanlar daha sık
+      const z = Math.pow(Math.random(), CFG.farBias);
+      const sc = mobile ? CFG.formScale.mobile : CFG.formScale.desktop;
+      const S = lerp(sc[0], sc[1], z);
+      const spot = findSpot(650 * S * 0.6);
       if (!spot) return;
       const [fx, fy] = spot;
       // Her türden, noktaya en yakın süzülen parçayı seç (doğal bir toplanma)
@@ -187,7 +198,7 @@
 
       forming++;
       spots.push(spot);
-      const S = mobile ? CFG.formScale.mobile : CFG.formScale.desktop;
+      const dForm = lerp(CFG.formDepth[0], CFG.formDepth[1], z);
       const tl = gsap.timeline({
         onComplete: () => {
           trio.forEach((p) => { p.mode = "drift"; });
@@ -201,14 +212,15 @@
       trio.forEach((p) => {
         p.mode = "form";
         const c = SHAPES[p.type].c;
-        // Ortak derinlik (1): parallax üç parçayı birlikte taşısın
+        // Ortak derinlik: parallax üç parçayı birlikte taşır; uzak F daha yavaş kayar
+        const op = p.type === "white" ? CFG.formOpacity.white : CFG.formOpacity.orange;
         tl.to(p, {
           x: fx + (c[0] - LOGO_C[0]) * S,
-          y: fy + par + (c[1] - LOGO_C[1]) * S,
+          y: fy + par * dForm + (c[1] - LOGO_C[1]) * S,
           r: Math.round(p.r / 360) * 360,
           s: S,
-          d: 1,
-          o: p.type === "white" ? 0.38 : 0.72,
+          d: dForm,
+          o: lerp(op[0], op[1], z),
           duration: CFG.formIn,
           ease: "power3.inOut",
         }, 0);
@@ -217,7 +229,7 @@
       // Dağılma: F'nin merkezinden dışarı doğru, yeni hız ve görünümle
       tl.add(() => {
         trio.forEach((p) => {
-          const ang = Math.atan2(p.y - par - fy, p.x - fx) + rand(-0.5, 0.5);
+          const ang = Math.atan2(p.y - par * dForm - fy, p.x - fx) + rand(-0.5, 0.5);
           const push = rand(60, 140);
           baseLook(p);
           p.d = rand(0.4, 1.4);
@@ -258,7 +270,7 @@
 
     // Hata ayıklama için durum (konsoldan: FS.worlds.state())
     if (window.FS) {
-      window.FS.worlds = { state: () => ({ W, H, avoid, forming, nextForm, visible, n: parts.length }) };
+      window.FS.worlds = { state: () => ({ W, H, avoid, forming, nextForm, visible, n: parts.length, spots: spots.map((s) => s.map(Math.round)) }) };
     }
 
     if (reduce) return; // sabit dursun
