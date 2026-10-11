@@ -317,11 +317,13 @@ html.lenis, html.lenis body { height: auto; }
 .footer__row { row-gap: 40px; }
 .footer__brand { grid-column: 1 / 6; }
 /* Logo kilidi: F logosu, "lower" el yazısı (Saithik), "Studios" Montserrat.
-   --lock-h logonun yüksekliği; diğer ölçüler fontların gerçek
-   ölçülerinden hesaplandı:
-   - Saithik gövde (x) yüksekliği ≈ 0.28em, Montserrat x yüksekliği ≈ 0.52em
-     → "lower" ile "Studios"un küçük harfleri aynı boyda
-   - Hepsi aynı taban çizgisinde; F'nin alt ucu da bu çizgide. */
+   --lock-h logonun yüksekliği. Saithik ölçüleri (em):
+     "l": tepe 0.811, taban çizgisinin altına 0.19 sarkar → toplam ≈ 1.0em
+     gövde (x) yüksekliği ≈ 0.28
+   Kural: "l" hiçbir zaman logodan büyük olmaz.
+   - Yazı boyutu 0.85 × logo → "l" logonun ~%87'si kadar
+   - Satır 0.16 × logo yukarı kaydırılır → "l"nin alt ucu F'nin ucuna değer
+   - "Studios" aynı satırda; küçük harfleri "lower"ın gövdesiyle aynı boyda */
 .brand-lock {
   --lock-h: 56px;
   display: inline-flex;
@@ -331,17 +333,22 @@ html.lenis, html.lenis body { height: auto; }
   line-height: 1;
 }
 .brand-lock svg { width: auto; height: var(--lock-h); flex: none; }
+.brand-lock__script,
+.brand-lock__word {
+  position: relative;
+  top: calc(var(--lock-h) * -0.16);
+}
 .brand-lock__script {
   font-family: "Saithik", "Yellowtail", cursive;
-  font-size: calc(var(--lock-h) * 1.0);
-  margin-left: calc(var(--lock-h) * -0.02);
+  font-size: calc(var(--lock-h) * 0.85);
+  margin-left: calc(var(--lock-h) * 0.01);
 }
 .brand-lock__word {
   font-family: var(--f-display);
   font-weight: 700;
-  font-size: calc(var(--lock-h) * 0.54);
+  font-size: calc(var(--lock-h) * 0.46);
   letter-spacing: 0.01em;
-  margin-left: calc(var(--lock-h) * 0.18);
+  margin-left: calc(var(--lock-h) * 0.16);
 }
 @media (max-width: 480px) {
   .brand-lock { --lock-h: 48px; }
