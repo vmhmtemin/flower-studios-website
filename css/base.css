@@ -39,6 +39,14 @@
   --dur-l: 1.1s;                            /* giriş anları */
 }
 
+/* ---------- Yerel font: Saithik (footer logo kilidi) ---------- */
+@font-face {
+  font-family: "Saithik";
+  src: url("../assets/fonts/Saithik-Handwritten.woff2") format("woff2"),
+       url("../assets/fonts/Saithik-Handwritten.ttf") format("truetype");
+  font-display: swap;
+}
+
 /* ---------- 2. Reset ---------- */
 *,
 *::before,
@@ -319,8 +327,8 @@ html.lenis, html.lenis body { height: auto; }
 }
 .brand-lock svg { width: auto; height: 64px; flex: none; }
 .brand-lock__script {
-  font-family: "Yellowtail", cursive;   /* Saithik gelince burası değişecek */
-  font-size: 46px;
+  font-family: "Saithik", "Yellowtail", cursive;
+  font-size: 58px;
 }
 .brand-lock__word {
   font-family: var(--f-display);
