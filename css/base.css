@@ -311,23 +311,23 @@ html.lenis, html.lenis body { height: auto; }
 .brand-lock {
   display: inline-flex;
   white-space: nowrap;
-  align-items: flex-end;
+  /* "lower" ve "STUDIOS" aynı taban çizgisinde; logonun alt ucu da bu çizgide */
+  align-items: baseline;
   gap: 2px;
   color: var(--c-white);
+  line-height: 1;
 }
 .brand-lock svg { width: auto; height: 64px; flex: none; }
 .brand-lock__script {
-  font-family: "Yellowtail", cursive;
+  font-family: "Yellowtail", cursive;   /* Saithik gelince burası değişecek */
   font-size: 46px;
-  line-height: 0.8;
-  margin-bottom: 1px;   /* taban çizgisi logonun ucuna otursun */
 }
 .brand-lock__word {
   font-family: var(--f-display);
   font-weight: 700;
   font-size: 20px;
   letter-spacing: 0.12em;
-  margin: 0 0 4px 12px;
+  margin-left: 12px;
 }
 .footer__nav { grid-column: 7 / 10; }
 .footer__social { grid-column: 10 / 13; }
