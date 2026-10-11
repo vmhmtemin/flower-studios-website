@@ -8,9 +8,10 @@
   <meta name="theme-color" content="#000000" />
   <link rel="icon" href="assets/logo/flower-mark.svg" type="image/svg+xml" />
 
-  <!-- Tema: kayıtlı tercih sayfa çizilmeden önce uygulanır (koyu varsayılan) -->
+  <!-- Sayfa çizilmeden önce: "js" sınıfı (menü en başta gizli başlasın) ve kayıtlı tema -->
   <script>
     (function () {
+      document.documentElement.classList.add("js");
       try {
         if (localStorage.getItem("fs-theme") === "light") {
           document.documentElement.setAttribute("data-theme", "light");
@@ -25,15 +26,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet" />
 
   <!-- ?v= : GitHub Pages dosyaları 10 dk önbelleğe aldığı için her sürümde artır -->
-  <link rel="stylesheet" href="css/base.css?v=22" />
-  <link rel="stylesheet" href="css/pages.css?v=22" />
+  <link rel="stylesheet" href="css/base.css?v=27" />
+  <link rel="stylesheet" href="css/pages.css?v=27" />
 
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script defer src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
-  <script defer src="js/parallax.js?v=22"></script>
-  <script defer src="js/hero-worlds.js?v=22"></script>
-  <script defer src="js/main.js?v=22"></script>
+  <script defer src="js/parallax.js?v=27"></script>
+  <script defer src="js/hero-worlds.js?v=27"></script>
+  <script defer src="js/main.js?v=27"></script>
 </head>
 
 <body>
@@ -50,7 +51,7 @@
   <a class="skip-link" href="#icerik">İçeriğe geç</a>
 
   <!-- ===================== NAVİGASYON ===================== -->
-  <header class="nav">
+  <header class="nav is-hidden">
     <div class="container nav__inner">
       <a href="index.html" class="nav__brand" aria-label="Flower Studios, ana sayfa">
         <svg width="18" height="28" viewBox="0 0 415 650" aria-hidden="true"><use href="#fs-mark" /></svg>
@@ -93,8 +94,8 @@
       <div class="hero__stage">
 
         <!-- Arka planda süzülen logo parçaları; arada bir birleşip F olurlar
-             (js/hero-worlds.js) -->
-        <svg class="hero__worlds" aria-hidden="true" focusable="false"></svg>
+             (js/hero-worlds.js; telefonda birleşme yok) -->
+        <div class="hero__worlds" aria-hidden="true"></div>
 
         <!-- Hero'nun arkasındaki dev çapraz turuncu şerit -->
         <div class="hero__beam" aria-hidden="true"></div>

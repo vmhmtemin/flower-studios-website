@@ -178,17 +178,32 @@
         },
       });
 
+      // Arkadaki uzay (süzülen parçalar + turuncu ışıma) kaydırdıkça kararır;
+      // son parça yerine oturduğu anda (1.16) tamamen sayfa rengindedir.
+      const space = { v: 1 };
+      const setSpace = () => {
+        stage.style.setProperty("--space", space.v.toFixed(3));
+        FS.heroSpace = space.v;
+      };
+
       tl.to(hint, { opacity: 0, duration: 0.1 }, 0)
+        .to(space, { v: 0, duration: 1.16, ease: "power1.in", onUpdate: setSpace }, 0)
         // Parçalar birleşiyor (her biri biraz farklı zamanlamayla)
         .to(scrollT, { white: 1, duration: 1, ease: "power2.inOut", onUpdate: render }, 0)
         .to(scrollT, { top: 1, duration: 1, ease: "power2.inOut", onUpdate: render }, 0.08)
         .to(scrollT, { bottom: 1, duration: 1, ease: "power2.inOut", onUpdate: render }, 0.16)
         // Birleşme anında ışık şeridi ekranı çapraz keser
         .to(beam, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 0.75)
-        .fromTo(
-          ".hero__logo",
-          { filter: "drop-shadow(0 0 40px rgba(254,92,29,0.18))" },
-          { filter: "drop-shadow(0 0 70px rgba(254,92,29,0.55))", duration: 0.25 },
+        // Birleşme anında logo parlar. Telefonda filtre yerine sabit ışık
+        // katmanının opaklığı artar (bkz. pages.css → TELEFON PERFORMANSI)
+        .add(
+          window.matchMedia("(max-width: 700px)").matches
+            ? gsap.fromTo(center, { "--glow": 0.35 }, { "--glow": 1, duration: 0.25 })
+            : gsap.fromTo(
+                ".hero__logo",
+                { filter: "drop-shadow(0 0 40px rgba(254,92,29,0.18))" },
+                { filter: "drop-shadow(0 0 70px rgba(254,92,29,0.55))", duration: 0.25 }
+              ),
           1.05
         )
         // Birleşmiş logo bir süre ekranda kalsın (boş tween = bekleme)

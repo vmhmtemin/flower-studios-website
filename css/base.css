@@ -179,7 +179,7 @@ html.lenis, html.lenis body { height: auto; }
   -webkit-backdrop-filter: blur(12px);
   border-color: var(--c-line);
 }
-.nav.is-hidden { transform: translateY(-100%); }
+.js .nav.is-hidden { transform: translateY(-100%); }   /* JS yoksa menü hep görünür */
 
 .nav__inner { display: flex; align-items: center; justify-content: space-between; }
 

@@ -20,7 +20,8 @@
   place-items: center;
   /* hafif turuncu ışık */
   background:
-    radial-gradient(60% 55% at 50% 55%, rgba(254, 92, 29, 0.10), transparent 70%),
+    /* --space: arkadaki uzayın görünürlüğü (1 → 0, F oturdukça; parallax.js) */
+    radial-gradient(60% 55% at 50% 55%, rgba(254, 92, 29, calc(0.10 * var(--space, 1))), transparent 70%),
     var(--bg);
 }
 
@@ -73,12 +74,21 @@
 .hero__worlds {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
   z-index: 1;
   pointer-events: none;
-  overflow: visible;
+  opacity: var(--space, 1);   /* F oturdukça uzay kararır */
 }
+/* Her parça kendi katmanında; hareket sadece transform/opacity */
+.hero__worlds .wp {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+  will-change: transform, opacity;
+}
+.hero__worlds .wp svg { position: absolute; overflow: visible; }
 .hero__worlds .wp--white { fill: var(--fg); }
 .hero__worlds .wp--orange { fill: var(--c-orange); }
 
@@ -556,6 +566,29 @@
 /* Açık temada ışık şeridi ve logo parlaması biraz daha belirgin */
 :root[data-theme="light"] .hero__stage {
   background:
-    radial-gradient(60% 55% at 50% 55%, rgba(254, 92, 29, 0.14), transparent 70%),
+    radial-gradient(60% 55% at 50% 55%, rgba(254, 92, 29, calc(0.14 * var(--space, 1))), transparent 70%),
     var(--bg);
+}
+
+/* ==========================================================================
+   TELEFON PERFORMANSI
+   Logodaki drop-shadow filtresi, parçalar hareket ettikçe her karede yeniden
+   hesaplanır. Telefonda aynı parlamayı logonun arkasında sabit bir ışık
+   katmanıyla veriyoruz (sadece opaklığı değişir, ucuz).
+   ========================================================================== */
+@media (max-width: 700px) {
+  .hero__logo { filter: none !important; }
+  .hero__center::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 70vw;
+    height: 70vw;
+    transform: translate(-50%, -18%);
+    background: radial-gradient(closest-side, rgba(254, 92, 29, 0.28), transparent);
+    opacity: var(--glow, 0.35);
+    pointer-events: none;
+    z-index: -1;
+  }
 }

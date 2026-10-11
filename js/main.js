@@ -87,22 +87,38 @@
     const toggle = document.querySelector(".nav__toggle");
     if (!nav) return;
 
+    /* Görünürlük kuralları:
+       - Sayfanın en başında gizli (hero'daki dağınık parçalarla çakışmasın);
+         biraz aşağı kaydırınca (SHOW_AFTER) yukarıdan gelir.
+       - Hero bittikten sonra: aşağı inerken gizlenir, yukarı çıkarken görünür.
+       - Mobil menü açıkken ya da klavye odağı menüdeyken hep görünür. */
+    const SHOW_AFTER = 60;
+    const heroEnd = () => {
+      const h = document.querySelector(".pin-spacer") || document.querySelector(".hero");
+      return h ? h.offsetHeight : window.innerHeight;
+    };
     let lastY = 0;
+    let focusInside = false;
     const onScroll = (y) => {
       nav.classList.toggle("is-scrolled", y > 40);
-      const goingDown = y > lastY + 2 && y > window.innerHeight * 0.6;
-      const goingUp = y < lastY - 2;
-      if (!document.body.classList.contains("nav-open")) {
-        if (goingDown) nav.classList.add("is-hidden");
-        else if (goingUp) nav.classList.remove("is-hidden");
+      if (document.body.classList.contains("nav-open") || focusInside) {
+        nav.classList.remove("is-hidden");
+      } else if (y < SHOW_AFTER) {
+        nav.classList.add("is-hidden");
+      } else if (y > heroEnd() && y > lastY + 2) {
+        nav.classList.add("is-hidden");
+      } else if (y < lastY - 2 || y <= heroEnd()) {
+        nav.classList.remove("is-hidden");
       }
       lastY = y;
     };
-    if (FS.lenis) FS.lenis.on("scroll", (e) => onScroll(e.scroll));
-    else window.addEventListener("scroll", () => onScroll(window.scrollY), { passive: true });
-
+    // Tarayıcının kendi kaydırma olayı: Lenis, kaydırma çubuğu, klavye ya da
+    // dokunmatik, her durumda tetiklenir
+    window.addEventListener("scroll", () => onScroll(window.scrollY), { passive: true });
+    onScroll(window.scrollY);
     // Klavye ile menüye gelen kullanıcı için nav her zaman görünür olsun
-    nav.addEventListener("focusin", () => nav.classList.remove("is-hidden"));
+    nav.addEventListener("focusin", () => { focusInside = true; nav.classList.remove("is-hidden"); });
+    nav.addEventListener("focusout", () => { focusInside = false; });
 
     if (!toggle) return;
     const setOpen = (open) => {
