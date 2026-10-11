@@ -16,7 +16,7 @@
      transform/opacity ile → ekran kartı taşır, her karede yeniden boyama
      yok (telefonda kasmayı önler). Tek döngü (gsap.ticker); konumu sadece
      render() yazar (ışınlanma olmaz).
-   - Telefonda (dar ekran) birleşme yok, sadece süzülen parçalar.
+   - Telefonda daha az parça ve aynı anda tek birleşme.
    - Aynı anda en fazla üç birleşme; birbirlerine çarpmayacak noktalarda.
    - Hero ekranda değilken ve sekme arka plandayken çalışmaz.
    - "Hareketi azalt" açıksa parçalar sabit durur, birleşme olmaz.
@@ -38,8 +38,8 @@
 
   // Ayarlar
   const CFG = {
-    count: { desktop: 22, mobile: 7 },
-    formOnMobile: false,           // telefonda birleşme kapalı (performans)
+    count: { desktop: 22, mobile: 14 },
+    formOnMobile: true,            // telefonda da birleşme var (aynı anda en fazla 1)
     farBias: 1,                    // 1: derinlikler eşit dağılır (>1 olursa uzak/küçük parçalar çoğalır)
     // Derinliğe göre (uzak → yakın)
     scale: [0.06, 0.22],           // parça boyu (logoya oranla); mobilde ×0.7
@@ -48,12 +48,13 @@
     depth: [0.3, 1.1],             // kaydırma parallax'ı
     spin: 7,                       // derece/sn (±)
     sizeMatch: 1.35,               // F için en büyük / en küçük parça oranı sınırı
+    sizeMatchMobile: 1.6,          // telefonda az parça var; tolerans biraz geniş (yine de çok farklı boylar eşleşmez)
     reach: 0.5,                    // eşleşecek parçalar en fazla ekranın uzun kenarının bu oranı kadar uzakta
     rest: 4,                       // sn — dağılan parça bu kadar süre yeni F'ye katılmaz
     formGlow: 1.6,                 // F olunca opaklık bu kadar artar (derinliğe göre sınırlı)
     formGlowCap: { white: 0.4, orange: 0.75 },
     formEvery: [1, 2.5],           // sn — birleşmeler arası bekleme
-    maxForming: 3,                 // aynı anda en fazla kaç F
+    maxForming: 3,                 // aynı anda en fazla kaç F (telefonda 1)
     gapPad: 40,                    // iki F'nin kenarları arasındaki en az boşluk (px)
     formIn: 1.8, hold: 1.6, formOut: 1.3,
     parallax: 0.35,
@@ -245,7 +246,7 @@
           for (const p of free) {
             if (p.type !== type) continue;
             const ratio = Math.max(p.baseS, seed.baseS) / Math.min(p.baseS, seed.baseS);
-            if (ratio > CFG.sizeMatch) continue;           // farklı derinlik: eşleşmez
+            if (ratio > (mobile ? CFG.sizeMatchMobile : CFG.sizeMatch)) continue;           // farklı derinlik: eşleşmez
             const dd = Math.hypot(p.x - seed.x, screenY(p) - screenY(seed));
             if (dd < bd) { bd = dd; best = p; }
           }
@@ -256,7 +257,7 @@
         const list = TYPES.map((t) => trio[t]);
         // Üç parçanın da birbirine uyumlu olduğundan emin ol
         const ss = list.map((p) => p.baseS);
-        if (Math.max(...ss) / Math.min(...ss) > CFG.sizeMatch) continue;
+        if (Math.max(...ss) / Math.min(...ss) > (mobile ? CFG.sizeMatchMobile : CFG.sizeMatch)) continue;
         return list;
       }
       return null;
@@ -337,7 +338,7 @@
       const dt = Math.min(deltaMs, 100) / 1000; // sekme dönüşünde büyük sıçrama olmasın
       par = window.scrollY * CFG.parallax;
       step(dt);
-      if ((CFG.formOnMobile || !mobile) && forming < CFG.maxForming) {
+      if ((CFG.formOnMobile || !mobile) && forming < (mobile ? 1 : CFG.maxForming)) {
         nextForm -= dt;
         if (nextForm <= 0) {
           nextForm = form() ? rand(CFG.formEvery[0], CFG.formEvery[1]) : 0.25;

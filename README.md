@@ -31,7 +31,7 @@ python3 -m http.server 8000
   (JS pin yok: telefonda titreme/adres çubuğu zıplaması olmaz). Parçalar kaydırma ilerlemesiyle
   birleşir, ışık şeridi geçer; geri kaydırınca ayrılır. Konumları tek bir `render()` yazar.
 - **Arka plan dünyaları** (`js/hero-worlds.js`): logonun parçaları derinlikleriyle süzülür,
-  aynı derinliktekiler ara sıra F olur. Telefonda birleşme yok, daha az parça.
+  aynı derinliktekiler ara sıra F olur. Telefonda daha az parça, aynı anda tek birleşme.
 - **Marquee**: iki özdeş grup, `-50%` ile dikişsiz döngü; kaydırma hızı akışı geçici hızlandırır.
 - **Hareketi azalt** açıksa: F birleşik, sticky aralık yok, döngüler durur.
 
