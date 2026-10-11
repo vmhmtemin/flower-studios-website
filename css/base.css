@@ -271,6 +271,24 @@ html.lenis, html.lenis body { height: auto; }
   font-size: 13px;
   color: var(--c-muted);
 }
+.footer__bottom { align-items: center; }
+
+/* İmza satırı: küçük F logosu + "Digitally crafted by Flower Studios." */
+.footer__credit {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+}
+.footer__credit svg {
+  width: 13px;
+  height: auto;
+  color: rgba(255, 255, 255, 0.85);
+  transition: transform 0.5s var(--ease-out);
+}
+.footer__credit:hover svg { transform: rotate(-8deg) scale(1.12); }
+
 /* Footer'daki dev, yarı saydam isim */
 .footer__giant {
   font-family: var(--f-display);
