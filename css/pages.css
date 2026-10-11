@@ -5,128 +5,126 @@
    ========================================================================== */
 
 /* ==========================================================================
-   HERO
-   --run: F'nin birleştiği kaydırma mesafesi. .hero__sticky bu mesafe
-   boyunca tarayıcının kendi sticky davranışıyla ekranda kalır.
+   HERO (ilk tasarımdaki hâli: ışık şeridi, parlama, ortalı yerleşim)
    ========================================================================== */
 .hero {
-  --run: 85vh;
   position: relative;
-  height: calc(100vh + var(--run));
-  height: calc(100svh + var(--run));
-}
-.hero__sticky {
-  position: sticky;
-  top: 0;
   height: 100vh;
   height: 100svh;
-  overflow: hidden;
 }
-.hero__frame {
-  height: 100%;
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto auto;
-  padding-top: var(--nav-h);
-  padding-bottom: clamp(20px, 3.5vh, 40px);
-}
-
 .hero__stage {
   position: relative;
-  min-height: 0;
+  height: 100%;
+  overflow: hidden;
   display: grid;
   place-items: center;
+  /* hafif turuncu ışık */
+  background:
+    radial-gradient(60% 55% at 50% 55%, rgba(254, 92, 29, 0.10), transparent 70%),
+    var(--c-black);
 }
-.hero__mark {
-  height: min(40vh, 310px);
-  width: auto;
-  overflow: visible;
+
+.hero__center {
   position: relative;
-  z-index: 2;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-inline: var(--gutter);
 }
 
-/* Birleşme anında logonun kendi açısıyla (üst şeridin eğimi) geçen ince çizgi */
-.hero__slash {
-  position: absolute;
-  left: 22%;
-  width: 56%;                   /* sahnenin içinde kalır, başlığa değmez */
-  top: 50%;
-  height: 2px;
-  background: var(--c-orange);
-  transform: rotate(-32deg) scaleX(0);
-  transform-origin: 50% 50%;
-  z-index: 1;
+.hero__logo {
+  width: clamp(110px, 16vw, 210px);
+  height: auto;
+  overflow: visible;
+  margin-bottom: clamp(24px, 4vh, 44px);
+  filter: drop-shadow(0 0 40px rgba(254, 92, 29, 0.18));
+}
+.hero__logo .piece { transform-box: fill-box; transform-origin: center; }
+
+/* Eski base.css'teki .display (sadece hero başlığı kullanıyor) */
+.hero__title.display {
+  font-family: var(--f-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 0.95;
 }
 
-/* Dağınık parçalar */
-.frag {
+.hero__title {
+  font-size: clamp(44px, 9.6vw, 150px);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 0.28em;
+  line-height: 0.9;
+}
+.hero__word--accent { color: var(--c-orange); }
+
+.hero__tagline {
+  margin-top: 26px;
+  color: var(--c-ash);
+  font-size: clamp(15px, 1.4vw, 19px);
+  letter-spacing: 0.02em;
+}
+
+/* Arka plan parçacıkları — logodaki üçgen formun küçük kopyaları */
+.hero__shards { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.shard {
   position: absolute;
   left: var(--x);
   top: var(--y);
   width: var(--s);
-  height: calc(var(--s) * 0.5);
+  height: calc(var(--s) * 0.55);
   transform: rotate(var(--r));
   clip-path: polygon(0 45%, 100% 0, 89% 55%, 0 100%);
-  will-change: transform, opacity;
+  will-change: transform;
 }
-.frag--o { background: var(--c-orange); opacity: 0.6; }
-.frag--w { background: var(--c-white); opacity: 0.22; }
+.shard--o { background: var(--c-orange); opacity: 0.55; }
+.shard--w { background: var(--c-white); opacity: 0.16; }
 
-/* İsim: ekran genişliğine tam oturur (main.js → FS.fit) */
-.hero__title {
-  font-family: var(--f-display);
-  font-weight: 800;
-  font-size: 9vw;               /* JS çalışmazsa yedek değer */
-  line-height: 0.8;
-  letter-spacing: -0.015em;
-  white-space: nowrap;
-  min-width: 0;                 /* grid öğesi içeriğe göre genişlemesin (ölçüm için) */
-  margin-top: clamp(12px, 2.5vh, 28px);
+/* Hero arkasındaki dev çapraz şerit */
+.hero__beam {
+  position: absolute;
+  z-index: 0;
+  left: -20%;
+  right: -20%;
+  top: 58%;
+  height: 22vh;
+  background: linear-gradient(90deg, transparent, rgba(254, 92, 29, 0.14) 30%, rgba(254, 92, 29, 0.05) 70%, transparent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
 }
-.fit-inner { display: inline-flex; gap: 0.24em; }
-.hero__word--o { color: var(--c-orange); }
 
-.hero__foot {
+/* "Kaydır" ipucu */
+.hero__hint {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  translate: -50% 0;
+  z-index: 3;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 24px;
-  margin-top: clamp(18px, 3vh, 32px);
-}
-.hero__tagline {
-  font-size: var(--t-lead);
-  line-height: 1.35;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--f-display);
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
   color: var(--c-ash);
 }
-.hero__scroll {
-  display: inline-flex;
-  align-items: center;
-  gap: 16px;
-  min-height: 44px;
-  font-size: var(--t-small);
-  font-weight: 500;
+.hero__hint i {
+  width: 1px;
+  height: 46px;
+  background: linear-gradient(var(--c-orange), transparent);
+  animation: hint 1.8s var(--ease) infinite;
+  transform-origin: top;
 }
-/* Çizgi, F'nin birleşme ilerlemesini gösterir */
-.hero__track {
-  position: relative;
-  width: clamp(72px, 9vw, 120px);
-  height: 2px;
-  background: var(--c-line);
-  overflow: hidden;
-}
-.hero__track i {
-  position: absolute;
-  inset: 0;
-  background: var(--c-orange);
-  transform: scaleX(0);
-  transform-origin: left;
-}
-
-@media (max-width: 700px) {
-  .hero { --run: 60vh; }
-  .hero__mark { height: min(30vh, 220px); }
-  .hero .fit-inner { flex-direction: column; gap: 0.06em; }
-  .hero__title { line-height: 0.84; }
-  .hero__foot { flex-direction: column; align-items: flex-start; gap: 14px; }
+@keyframes hint {
+  0%   { transform: scaleY(0); opacity: 1; }
+  60%  { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(1); opacity: 0; }
 }
 
 /* ==========================================================================
@@ -544,9 +542,6 @@
    HAREKETİ AZALT: F birleşik, sticky aralık yok, döngüler durur
    ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
-  .hero { --run: 0px; }
-  .frag, .hero__slash { display: none; }
-  .hero__track i { transform: scaleX(1); }
   .about__text .hl-word { opacity: 1; }
   .growth__step { opacity: 1; color: var(--c-white); }
   .slash i { transform: rotate(var(--slant)) scaleX(1); }

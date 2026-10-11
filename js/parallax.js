@@ -4,8 +4,8 @@
    ("fs:ready") çalışır.
 
    HAREKET SİSTEMİ
-   - F'nin birleşmesi sayfanın tek "büyük anı"dır; hero'da başlar,
-     kapanış bölümünde dev ölçekte tekrar eder.
+   - F'nin birleşmesi sayfanın tek "büyük anı"dır; hero'da ışık şeridi ve
+     parlamayla birleşir (pin + scrub), kapanışta dev ölçekte tekrar eder.
    - Kaydırmaya bağlı her şey doğrudan kaydırma ilerlemesinden hesaplanır
      (gecikmeli scrub yok), bu yüzden hızlı kaydırmada da, geri
      kaydırmada da doğru konumdadır. Yumuşaklığı Lenis sağlar.
@@ -80,101 +80,142 @@
   });
 
   /* ------------------------------------------------------------------
-     2. HERO
-     .hero'nun ekran yüksekliğini aşan kısmı (--run) boyunca .hero__sticky
-     sabit kalır. İlerleme = bu aralıktaki konum. Aralık bitince sayfa
-     normal akar; kullanıcı hiçbir yerde kilitlenmez.
+     2. HERO (ilk tasarımdaki hâli)
+     Açılışta logo parçaları dağınık halde ekrana gelir, başlık harf harf
+     belirir. Kaydırınca parçalar birleşir, ışık şeridi geçer, sonra tüm
+     içerik yukarı kayarak bir sonraki bölüme yer açar.
      ------------------------------------------------------------------ */
   function initHero() {
     const hero = document.querySelector(".hero");
     if (!hero) return;
-
-    const svg = hero.querySelector(".hero__mark");
-    // Dar ekranda dağınık parçalar ekrandan taşmasın: parçalar tam dağınık
-    // konumdayken gerçek kutuları ölçülür, gerekirse mesafe orantılı küçültülür.
-    // (Sadece yükleme ve yeniden boyutlandırmada çalışır.)
-    let k = 1;
-    const measureK = () => {
-      k = 1;
-      render(0);
-      const m = svg.getBoundingClientRect();
-      const cx = m.left + m.width / 2;
-      let minL = Infinity, maxR = -Infinity;
-      svg.querySelectorAll(".piece").forEach((el) => {
-        const r = el.getBoundingClientRect();
-        minL = Math.min(minL, r.left);
-        maxR = Math.max(maxR, r.right);
-      });
-      const margin = 12;
-      const halfMark = m.width / 2;
-      // Öteleme kısmı ölçeklenir; logo genişliği sabit kalır
-      const kL = (cx - margin - halfMark) / Math.max(1, cx - minL - halfMark);
-      const kR = (window.innerWidth - margin - cx - halfMark) / Math.max(1, maxR - cx - halfMark);
-      k = Math.max(0.3, Math.min(1, kL, kR));
-    };
-    const render = convergeF(
-      {
-        white: svg.querySelector('[data-piece="white"]'),
-        top: svg.querySelector('[data-piece="top"]'),
-        bottom: svg.querySelector('[data-piece="bottom"]'),
-      },
-      () => k
-    );
-    const slash = hero.querySelector(".hero__slash");
-    const track = hero.querySelector(".hero__track i");
+    const FS = window.FS;
     const stage = hero.querySelector(".hero__stage");
-    const frags = [...hero.querySelectorAll(".frag")];
-
-    // Küçük parçaların merkeze uzaklığı: sadece ölçüm anında hesaplanır
-    let fragData = [];
-    const measure = () => {
-      const r = stage.getBoundingClientRect();
-      const cx = r.left + r.width / 2;
-      const cy = r.top + r.height / 2;
-      fragData = frags.map((f) => {
-        gsap.set(f, { x: 0, y: 0, scale: 1 });
-        const fr = f.getBoundingClientRect();
-        return { el: f, dx: cx - (fr.left + fr.width / 2), dy: cy - (fr.top + fr.height / 2) };
-      });
+    const pieces = {
+      white: hero.querySelector(".piece--white"),
+      top: hero.querySelector(".piece--top"),
+      bottom: hero.querySelector(".piece--bottom"),
     };
-    const baseOpacity = frags.map((f) => parseFloat(getComputedStyle(f).opacity));
-
-    const update = (p) => {
-      render(p);
-      // İnce çizgi, parçalar yerine otururken logonun açısıyla geçer
-      gsap.set(slash, { rotation: -32, scaleX: ease(range(p, 0.62, 0.95)) });
-      track.style.transform = `scaleX(${p})`;
-      // Küçük parçalar merkeze çekilir ve söner: parçalardan bütüne
-      const e = ease(range(p, 0, 0.9));
-      fragData.forEach((d, i) => {
-        gsap.set(d.el, { x: d.dx * e * 0.8, y: d.dy * e * 0.8, scale: 1 - 0.5 * e });
-        d.el.style.opacity = baseOpacity[i] * (1 - e) * fragIntro.v;
-      });
-    };
-
-    /* Açılış: tek orkestre an. Kaydırmanın kontrol ettiği özelliklere
-       (parça konumları) dokunmaz; sadece görünürlük ve başlık kelimeleri. */
-    const fragIntro = { v: 0 };
     const words = hero.querySelectorAll(".hero__word");
-    words.forEach((w) => (w.style.display = "inline-block"));
-    hero.querySelector(".fit-inner").style.overflow = "hidden"; // kelimeler maskeden çıksın
+    const chars = [];
+    words.forEach((w) => chars.push(...FS.split(w, "chars")));
+    const tagline = hero.querySelector(".hero__tagline");
+    const hint = hero.querySelector(".hero__hint");
+    const beam = hero.querySelector(".hero__beam");
+    const center = hero.querySelector(".hero__center");
 
-    const st = ScrollTrigger.create({
-      trigger: hero,
-      start: "top top",
-      end: "bottom bottom",
-      onUpdate: (self) => update(self.progress),
-      onRefresh: (self) => { measureK(); measure(); update(self.progress); },
+    // Ekran genişliğine göre dağılma mesafesi
+    const spread = () => Math.min(window.innerWidth, 1400) / 1400;
+
+    // Parçaların "dağınık" konumları (logo birimi değil, piksel)
+    const scattered = {
+      white: () => ({ x: -280 * spread(), y: -30, rotate: -28 }),
+      top: () => ({ x: 300 * spread(), y: -110, rotate: 32 }),
+      bottom: () => ({ x: 380 * spread(), y: 10, rotate: -22 }),
+    };
+
+    // Işık şeridinin açısı GSAP üzerinden veriliyor (CSS'te scaleX(0) iken
+    // tarayıcı açıyı kaybettiği için)
+    gsap.set(beam, { rotate: -24, scaleX: 0, transformOrigin: "0% 50%" });
+
+    /* --- Açılış animasyonu (sayfa yüklenince bir kez) --- */
+    const intro = gsap.timeline({ defaults: { ease: "expo.out" } });
+    Object.keys(pieces).forEach((k, i) => {
+      intro.fromTo(
+        pieces[k],
+        { ...scaledFar(scattered[k]()), opacity: 0 },
+        { ...scattered[k](), opacity: 1, duration: 1.6 },
+        0.1 + i * 0.12
+      );
     });
-    measureK();
-    measure();
-    update(st.progress);
+    intro
+      .from(chars, { yPercent: 115, rotate: 10, duration: 1.2, stagger: 0.035 }, 0.35)
+      .from(tagline, { opacity: 0, y: 20, duration: 1 }, 0.9)
+      .from(hint, { opacity: 0, duration: 1 }, 1.2);
 
-    gsap.timeline({ defaults: { ease: "expo.out" } })
-      .from(svg, { opacity: 0, duration: 1.2 }, 0)
-      .from(words, { yPercent: 105, duration: 1.2, stagger: 0.09 }, 0.15)
-      .from(".hero__foot > *", { opacity: 0, y: 12, duration: 0.9, stagger: 0.08 }, 0.55)
-      .to(fragIntro, { v: 1, duration: 1.2, onUpdate: () => update(st.progress) }, 0.3);
+    // Pencere boyutu değişince yeniden hesaplanan (fonksiyon tabanlı) değerler
+    function live(k) {
+      return {
+        x: () => scattered[k]().x,
+        y: () => scattered[k]().y,
+        rotate: () => scattered[k]().rotate,
+      };
+    }
+
+    // Dağınık konumun 2.2 katı uzaktan başla
+    function scaledFar(p) {
+      return { x: p.x * 2.2, y: p.y * 2.2, rotate: p.rotate * 2 };
+    }
+
+    /* --- Kaydırma ile birleşme (pin + scrub) ---
+       Pin, diğer bölümlerin konum hesabını etkilediği için en başta
+       oluşturuluyor. Parça animasyonları immediateRender:false ile
+       açılış animasyonunu bozmadan bekler. Kullanıcı açılış bitmeden
+       kaydırırsa açılış hızlandırılır. */
+    const skipIntro = () => intro.progress() < 1 && intro.timeScale(4);
+    window.addEventListener("wheel", skipIntro, { once: true, passive: true });
+    window.addEventListener("touchstart", skipIntro, { once: true, passive: true });
+
+    buildScrollTimeline();
+
+    function buildScrollTimeline() {
+      const tl = gsap.timeline({
+        defaults: { ease: "none" },
+        scrollTrigger: {
+          trigger: hero,
+          start: "top top",
+          end: "+=120%",
+          pin: true,
+          scrub: 1,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+        },
+      });
+
+      tl.to(hint, { opacity: 0, duration: 0.1 }, 0)
+        // Parçalar birleşiyor (her biri biraz farklı zamanlamayla)
+        .fromTo(pieces.white, live("white"), { x: 0, y: 0, rotate: 0, duration: 1, ease: "power2.inOut", immediateRender: false }, 0)
+        .fromTo(pieces.top, live("top"), { x: 0, y: 0, rotate: 0, duration: 1, ease: "power2.inOut", immediateRender: false }, 0.08)
+        .fromTo(pieces.bottom, live("bottom"), { x: 0, y: 0, rotate: 0, duration: 1, ease: "power2.inOut", immediateRender: false }, 0.16)
+        // Birleşme anında ışık şeridi ekranı çapraz keser
+        .to(beam, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 0.75)
+        .fromTo(
+          ".hero__logo",
+          { filter: "drop-shadow(0 0 40px rgba(254,92,29,0.18))" },
+          { filter: "drop-shadow(0 0 70px rgba(254,92,29,0.55))", duration: 0.25 },
+          1.05
+        )
+        // Birleşmiş logo bir süre ekranda kalsın (boş tween = bekleme)
+        .to({}, { duration: 0.4 });
+
+      // Pin bittikten sonra: bir sonraki bölüm gelirken içerik parallax ile
+      // daha yavaş yukarı kayar ve söner (boş ekran kalmaz)
+      const next = hero.closest(".pin-spacer")?.nextElementSibling || hero.nextElementSibling;
+      if (next) {
+        gsap.to(center, {
+          yPercent: -35,
+          scale: 0.92,
+          opacity: 0,
+          ease: "none",
+          scrollTrigger: { trigger: next, start: "top bottom", end: "top 25%", scrub: true },
+        });
+        gsap.to(beam, {
+          opacity: 0,
+          ease: "none",
+          scrollTrigger: { trigger: next, start: "top bottom", end: "top 50%", scrub: true },
+        });
+      }
+
+      // Arka plan parçacıkları pin süresince kendi hızlarında yukarı kayar
+      hero.querySelectorAll(".shard").forEach((el) => {
+        const speed = parseFloat(el.dataset.speed || 1);
+        gsap.to(el, {
+          y: () => -speed * window.innerHeight * 0.45,
+          rotate: `+=${speed * 25}`,
+          ease: "none",
+          scrollTrigger: { trigger: hero, start: "top top", end: "bottom+=120% top", scrub: true },
+        });
+      });
+    }
   }
 
   /* ------------------------------------------------------------------

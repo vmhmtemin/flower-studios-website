@@ -286,17 +286,25 @@ html.lenis, html.lenis body { height: auto; }
   padding-block: clamp(64px, 8vw, 110px) 32px;
   border-top: 1px solid var(--c-line);
 }
-/* Dev kontür isim — genişliğe JS ile tam oturtulur (data-fit) */
+/* Dev isim: turuncu şerit üzerinde siyah yazı. Şerit .fit-inner'ın
+   kendisi olduğu için iç boşluklar (em) yazıyla birlikte ölçeklenir ve
+   FS.fit şeridi kapsayıcı genişliğine tam oturtur. */
 .footer__giant {
   font-family: var(--f-display);
   font-weight: 800;
   font-size: 10vw;
   line-height: 0.82;
   letter-spacing: -0.02em;
-  color: var(--c-soot);   /* kontür yerine koyu dolgu */
   white-space: nowrap;
   user-select: none;
   margin-bottom: clamp(48px, 6vw, 80px);
+}
+.footer__giant .fit-inner {
+  align-items: center;
+  line-height: 1;
+  background: #ba391e;
+  color: var(--c-black);
+  padding: 0.1em 0.04em 0.1em 0.06em;
 }
 .footer__row { row-gap: 40px; }
 .footer__brand { grid-column: 1 / 6; }
